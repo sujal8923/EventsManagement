@@ -17,7 +17,6 @@ public class EventRegistration {
     private String email;
     private String phone;
     private String college;
-
     public EventRegistration(Long id, User user, Event event, String name, String email, String phone, String college) {
         this.id = id;
         this.user = user;
@@ -31,7 +30,6 @@ public class EventRegistration {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
