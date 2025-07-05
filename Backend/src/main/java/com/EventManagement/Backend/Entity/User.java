@@ -45,10 +45,4 @@ public class User {
         this.role = role;
     }
 
-    public User(long id, String userName, String password, String role) {
-        this.id = id;
-        this.userName = userName;
-        this.password = password;
-        this.role = role;
-    }
 }

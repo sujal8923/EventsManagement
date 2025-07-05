@@ -1,9 +1,11 @@
 package com.EventManagement.Backend.Entity;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
+@Entity
 public class EventRegistration {
     @Id
 
@@ -17,15 +19,7 @@ public class EventRegistration {
     private String email;
     private String phone;
     private String college;
-    public EventRegistration(Long id, User user, Event event, String name, String email, String phone, String college) {
-        this.id = id;
-        this.user = user;
-        this.event = event;
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.college = college;
-    }
+
 
     public Long getId() {
         return id;
