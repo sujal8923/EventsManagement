@@ -1,8 +1,10 @@
 package com.EventManagement.Backend.Entity;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+@Entity
 public class Event {
     @Id
     @GeneratedValue
@@ -12,13 +14,7 @@ public class Event {
     private String description;
     private String date;
 
-    public Event(Long id, String title, String imageUrl, String description, String date) {
-        this.id = id;
-        this.title = title;
-        this.imageUrl = imageUrl;
-        this.description = description;
-        this.date = date;
-    }
+
 
     public Long getId() {
         return id;
