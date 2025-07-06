@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/superadmin")
+@CrossOrigin(origins = "http://localhost:5173")
 public class SuperAdminController {
     @Autowired
     private EventService eventService;
