@@ -1,29 +1,65 @@
 import React, { useState } from 'react';
 import {
   UserIcon,
-  EnvelopeIcon,
   LockClosedIcon,
 } from '@heroicons/react/24/outline';
 
 function Login() {
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+
+  const [loginForm, setLoginForm] = useState({
+    username: '',
+    password: '',
+  });
+
+  const [signupForm, setSignupForm] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+  });
 
   const inputStyle =
     'w-full pl-10 p-3 rounded-md border border-gray-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:shadow-md placeholder-gray-400 transition-all';
+
+  const handleChange = (e, type) => {
+    const { name, value } = e.target;
+    if (type === 'login') {
+      setLoginForm(prev => ({ ...prev, [name]: value }));
+    } else {
+      setSignupForm(prev => ({ ...prev, [name]: value }));
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!email || !password || (!isLoginMode && password.length < 6)) {
-      setErrorMsg('Please fill all fields correctly.');
-      return;
-    }
+    if (isLoginMode) {
+      const { username, password } = loginForm;
+      if (!username || !password) {
+        setErrorMsg('Please fill all fields.');
+        return;
+      }
 
-    console.log('Submit', { email, password });
+      // 💥 Only send username & password
+      const payload = { username, password };
+      console.log('Login Payload:', payload);
+      // e.g. fetch('/api/login', { method: 'POST', body: JSON.stringify(payload) })
+    } else {
+      const { username, password, confirmPassword } = signupForm;
+
+      // 🔒 Frontend password match + length check
+      if (!username || !password || password.length < 6 || password !== confirmPassword) {
+        setErrorMsg('Please fill all fields correctly.');
+        return;
+      }
+
+      // 💥 Strip out confirmPassword before sending
+      const payload = { username, password };
+      console.log('Signup Payload:', payload);
+      // e.g. fetch('/api/signup', { method: 'POST', body: JSON.stringify(payload) })
+    }
   };
 
   return (
@@ -62,26 +98,15 @@ function Login() {
 
       {/* Form */}
       <form className="space-y-4" onSubmit={handleSubmit}>
-        {!isLoginMode && (
-          <div className="relative">
-            <UserIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Name"
-              className={inputStyle}
-              required
-            />
-          </div>
-        )}
-
         <div className="relative">
-          <EnvelopeIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
+          <UserIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
           <input
-            type="email"
-            placeholder="Email Address"
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={isLoginMode ? loginForm.username : signupForm.username}
+            onChange={(e) => handleChange(e, isLoginMode ? 'login' : 'signup')}
             className={inputStyle}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -90,31 +115,28 @@ function Login() {
           <LockClosedIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
           <input
             type="password"
+            name="password"
             placeholder="Password"
+            value={isLoginMode ? loginForm.password : signupForm.password}
+            onChange={(e) => handleChange(e, isLoginMode ? 'login' : 'signup')}
             className={inputStyle}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
 
+        {/* Frontend-only confirm password */}
         {!isLoginMode && (
           <div className="relative">
             <LockClosedIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
             <input
               type="password"
+              name="confirmPassword"
               placeholder="Confirm Password"
+              value={signupForm.confirmPassword}
+              onChange={(e) => handleChange(e, 'signup')}
               className={inputStyle}
               required
             />
-          </div>
-        )}
-
-        {isLoginMode && (
-          <div className="text-right">
-            <p className="text-cyan-600 text-sm hover:underline cursor-pointer">
-              Forgot password?
-            </p>
           </div>
         )}
 

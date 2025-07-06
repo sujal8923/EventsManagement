@@ -12,9 +12,16 @@ public class Event {
     private String title;
     private String imageUrl;
     private String description;
+    private String location;
     private String date;
 
+    public String getLocation() {
+        return location;
+    }
 
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public Long getId() {
         return id;
