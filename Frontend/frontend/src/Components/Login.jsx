@@ -1,65 +1,75 @@
 import React, { useState } from 'react';
+// Removed: import { useNavigate } from 'react-router-dom'; // This is handled by App.jsx
+
 import {
   UserIcon,
+  EnvelopeIcon, // Still using EnvelopeIcon for the input, but it represents username now
   LockClosedIcon,
 } from '@heroicons/react/24/outline';
 
-function Login() {
+function Login({ onLoginSuccess }) {
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const [username, setUsername] = useState(''); // Changed from email to username
+  const [password, setPassword] = useState('');
+  // Confirm Password state is only relevant for Signup
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-
-  const [loginForm, setLoginForm] = useState({
-    username: '',
-    password: '',
-  });
-
-  const [signupForm, setSignupForm] = useState({
-    username: '',
-    password: '',
-    confirmPassword: '',
-  });
+  const [loading, setLoading] = useState(false);
 
   const inputStyle =
     'w-full pl-10 p-3 rounded-md border border-gray-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:shadow-md placeholder-gray-400 transition-all';
 
-  const handleChange = (e, type) => {
-    const { name, value } = e.target;
-    if (type === 'login') {
-      setLoginForm(prev => ({ ...prev, [name]: value }));
-    } else {
-      setSignupForm(prev => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setLoading(true);
 
     if (isLoginMode) {
-      const { username, password } = loginForm;
-      if (!username || !password) {
-        setErrorMsg('Please fill all fields.');
+      // --- Login Validation ---
+      if (!username || !password) { // Changed from email to username
+        setErrorMsg('Username and password are required.');
+        setLoading(false);
         return;
       }
-
-      // 💥 Only send username & password
-      const payload = { username, password };
-      console.log('Login Payload:', payload);
-      // e.g. fetch('/api/login', { method: 'POST', body: JSON.stringify(payload) })
     } else {
-      const { username, password, confirmPassword } = signupForm;
-
-      // 🔒 Frontend password match + length check
-      if (!username || !password || password.length < 6 || password !== confirmPassword) {
-        setErrorMsg('Please fill all fields correctly.');
+      // --- Sign Up Validation ---
+      if (!username || !password || !confirmPassword) { // Changed from name/email to username
+        setErrorMsg('Please fill all fields for sign up.');
+        setLoading(false);
         return;
       }
-
-      // 💥 Strip out confirmPassword before sending
-      const payload = { username, password };
-      console.log('Signup Payload:', payload);
-      // e.g. fetch('/api/signup', { method: 'POST', body: JSON.stringify(payload) })
+      if (password.length < 6) {
+        setErrorMsg('Password must be at least 6 characters long.');
+        setLoading(false);
+        return;
+      }
+      if (password !== confirmPassword) {
+        setErrorMsg('Passwords do not match.');
+        setLoading(false);
+        return;
+      }
     }
+
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (isLoginMode) {
+      // --- Login Logic ---
+      // Changed email to username in hardcoded checks
+      if (username === 'superadmin@example.com' && password === 'superadmin123') {
+        onLoginSuccess('superadmin');
+      } else if (username === 'admin@example.com' && password === 'admin123') {
+        onLoginSuccess('admin');
+      } else {
+        onLoginSuccess('user');
+      }
+    } else {
+      // --- Sign Up Logic ---
+      console.log('Sign Up Data:', { username, password }); // Changed name/email to username
+      onLoginSuccess('user'); // Auto-login as user after successful signup
+      setErrorMsg('Sign up successful!'); // Optional feedback
+    }
+    setLoading(false);
   };
 
   return (
@@ -74,7 +84,13 @@ function Login() {
       {/* Toggle */}
       <div className="relative flex h-12 mb-6 border border-gray-300 rounded-full overflow-hidden">
         <button
-          onClick={() => setIsLoginMode(true)}
+          onClick={() => {
+            setIsLoginMode(true);
+            setErrorMsg('');
+            setUsername(''); // Clear username
+            setPassword('');
+            setConfirmPassword('');
+          }}
           className={`w-1/2 z-10 text-lg font-medium transition-all hover:font-semibold ${
             isLoginMode ? 'text-white' : 'text-gray-700'
           }`}
@@ -82,7 +98,13 @@ function Login() {
           Login
         </button>
         <button
-          onClick={() => setIsLoginMode(false)}
+          onClick={() => {
+            setIsLoginMode(false);
+            setErrorMsg('');
+            setUsername(''); // Clear username
+            setPassword('');
+            setConfirmPassword('');
+          }}
           className={`w-1/2 z-10 text-lg font-medium transition-all hover:font-semibold ${
             !isLoginMode ? 'text-white' : 'text-gray-700'
           }`}
@@ -98,45 +120,53 @@ function Login() {
 
       {/* Form */}
       <form className="space-y-4" onSubmit={handleSubmit}>
+        {/* Username field - for both Login and Sign Up */}
         <div className="relative">
-          <UserIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
+          <UserIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" /> {/* Using UserIcon for username */}
           <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={isLoginMode ? loginForm.username : signupForm.username}
-            onChange={(e) => handleChange(e, isLoginMode ? 'login' : 'signup')}
+            type="text" // Changed type to text for generic username
+            placeholder="Username" // Changed placeholder
             className={inputStyle}
+            value={username} // Changed from email to username
+            onChange={(e) => setUsername(e.target.value)} // Changed from setEmail to setUsername
             required
           />
         </div>
 
+        {/* Password field - for both Login and Sign Up */}
         <div className="relative">
           <LockClosedIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
           <input
             type="password"
-            name="password"
             placeholder="Password"
-            value={isLoginMode ? loginForm.password : signupForm.password}
-            onChange={(e) => handleChange(e, isLoginMode ? 'login' : 'signup')}
             className={inputStyle}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
 
-        {/* Frontend-only confirm password */}
+        {/* Confirm Password field - only for Sign Up */}
         {!isLoginMode && (
           <div className="relative">
             <LockClosedIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
             <input
               type="password"
-              name="confirmPassword"
               placeholder="Confirm Password"
-              value={signupForm.confirmPassword}
-              onChange={(e) => handleChange(e, 'signup')}
               className={inputStyle}
-              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required // Required for signup
             />
+          </div>
+        )}
+
+        {/* Forgot password link - only for Login */}
+        {isLoginMode && (
+          <div className="text-right">
+            <p className="text-cyan-600 text-sm hover:underline cursor-pointer">
+              Forgot password?
+            </p>
           </div>
         )}
 
@@ -148,16 +178,30 @@ function Login() {
 
         <button
           type="submit"
-          className="w-full p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
+          className="w-full p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg flex items-center justify-center"
+          disabled={loading}
         >
-          {isLoginMode ? 'Login' : 'Sign Up'}
+          {loading ? (
+            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          ) : (
+            isLoginMode ? 'Login' : 'Sign Up'
+          )}
         </button>
 
         <p className="text-center text-sm text-gray-600">
           {isLoginMode ? "Don't have an account?" : 'Already have an account?'}
           <button
             type="button"
-            onClick={() => setIsLoginMode(!isLoginMode)}
+            onClick={() => {
+              setIsLoginMode(!isLoginMode);
+              setErrorMsg('');
+              setUsername(''); // Clear username
+              setPassword('');
+              setConfirmPassword('');
+            }}
             className="text-cyan-600 ml-1 hover:underline font-medium"
           >
             {isLoginMode ? 'Sign Up now' : 'Login'}
