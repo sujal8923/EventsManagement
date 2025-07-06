@@ -28,7 +28,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Map<String,String> body, HttpSession httpSession){
 
-        User user = userService.login(body.get("username"),body.get("password"));
+        User user = userService.login(body.get("email"),body.get("password"));
         if (user == null){
             return ResponseEntity.status(401).body("not logged in");
         }

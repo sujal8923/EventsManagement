@@ -9,9 +9,18 @@ public class User {
     @Id
     @GeneratedValue
     private long id;
+    private String  email;
     private String userName;
     private  String password;
     private  String role;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public long getId() {
         return id;
