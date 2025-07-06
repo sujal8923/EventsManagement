@@ -14,12 +14,14 @@
 import React from 'react';
 import Login from './Components/Login';
 import UserHomeCarowsels from './Components/UserHomeCarowsels';
+import SingleEventCard from './Components/SingleEventCard';
 
 function App() {
   return (
     <div className="">
       {/* <Login /> */}
-      <UserHomeCarowsels/>
+      {/* <UserHomeCarowsels/> */}
+      <SingleEventCard/>
     </div>
   );
 }
