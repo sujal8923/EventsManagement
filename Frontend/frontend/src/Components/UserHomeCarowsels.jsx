@@ -7,9 +7,10 @@ function UserHomeCarowsels() {
   // 🔹 Dummy data for preview
   useEffect(() => {
     const dummyEvents = [
+      
       {
         title: "Tech Conference 2025",
-        image: "https://via.placeholder.com/300x120.png?text=Tech+Conf",
+        image: "https://kommunity-app.s3.ap-south-1.amazonaws.com/1qvyvdz3n0q7a58npgsmaw26gdwj?response-content-disposition=inline%3B%20filename%3D%22Commudle%20Banner.png%22%3B%20filename%2A%3DUTF-8%27%27Commudle%2520Banner.png&response-content-type=image%2Fpng&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAXUMQJEJBCK2EC566%2F20250706%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20250706T063419Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=01f80e5281622125a41d7ae1beafc760db1f21126d7582b8bfa72af6d8222b21",
         time: "10:00 AM - 4:00 PM",
         location: "Delhi Convention Center",
         description: "A tech meetup with top speakers from around the globe.",
@@ -39,13 +40,13 @@ function UserHomeCarowsels() {
 
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % events.length);
-    }, 3000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [events]);
 
   return (
-    <div className="h-screen bg-gradient-to-br from-rose-400 to-pink-300 flex items-center justify-center">
+    <div className="h-screen bg-gradient-to-br from-rose-400 to-pink-300 ">
       <div className="relative w-[90%] max-w-4xl h-[350px] flex items-center justify-center">
         {events.map((event, index) => {
           const isActive = index === activeIndex;

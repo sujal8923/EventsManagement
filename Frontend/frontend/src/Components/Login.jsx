@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 // Removed: import { useNavigate } from 'react-router-dom'; // This is handled by App.jsx
 
+
 import {
   UserIcon,
   EnvelopeIcon, // Still using EnvelopeIcon for the input, but it represents username now
   LockClosedIcon,
 } from '@heroicons/react/24/outline';
+
 
 function Login({ onLoginSuccess }) {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -16,13 +18,16 @@ function Login({ onLoginSuccess }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
+
   const inputStyle =
     'w-full pl-10 p-3 rounded-md border border-gray-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:shadow-md placeholder-gray-400 transition-all';
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setLoading(true);
+
 
     if (isLoginMode) {
       // --- Login Validation ---
@@ -50,8 +55,10 @@ function Login({ onLoginSuccess }) {
       }
     }
 
+
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
+
 
     if (isLoginMode) {
       // --- Login Logic ---
@@ -72,6 +79,7 @@ function Login({ onLoginSuccess }) {
     setLoading(false);
   };
 
+
   return (
     <div className="w-full sm:max-w-md bg-white/70 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-slate-200 animate-fade-in mx-4">
       {/* Header */}
@@ -80,6 +88,7 @@ function Login({ onLoginSuccess }) {
           {isLoginMode ? 'Login' : 'Sign Up'}
         </h2>
       </div>
+
 
       {/* Toggle */}
       <div className="relative flex h-12 mb-6 border border-gray-300 rounded-full overflow-hidden">
@@ -118,6 +127,7 @@ function Login({ onLoginSuccess }) {
         ></div>
       </div>
 
+
       {/* Form */}
       <form className="space-y-4" onSubmit={handleSubmit}>
         {/* Username field - for both Login and Sign Up */}
@@ -133,6 +143,7 @@ function Login({ onLoginSuccess }) {
           />
         </div>
 
+
         {/* Password field - for both Login and Sign Up */}
         <div className="relative">
           <LockClosedIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
@@ -145,6 +156,7 @@ function Login({ onLoginSuccess }) {
             required
           />
         </div>
+
 
         {/* Confirm Password field - only for Sign Up */}
         {!isLoginMode && (
@@ -161,6 +173,7 @@ function Login({ onLoginSuccess }) {
           </div>
         )}
 
+
         {/* Forgot password link - only for Login */}
         {isLoginMode && (
           <div className="text-right">
@@ -170,11 +183,13 @@ function Login({ onLoginSuccess }) {
           </div>
         )}
 
+
         {errorMsg && (
           <p className="text-red-500 text-sm font-medium text-center">
             {errorMsg}
           </p>
         )}
+
 
         <button
           type="submit"
@@ -190,6 +205,7 @@ function Login({ onLoginSuccess }) {
             isLoginMode ? 'Login' : 'Sign Up'
           )}
         </button>
+
 
         <p className="text-center text-sm text-gray-600">
           {isLoginMode ? "Don't have an account?" : 'Already have an account?'}
@@ -211,5 +227,6 @@ function Login({ onLoginSuccess }) {
     </div>
   );
 }
+
 
 export default Login;

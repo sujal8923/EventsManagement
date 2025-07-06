@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 
+
 // Import all your components
 import Login from './Components/Login';
 import UserHomePage from './Components/UserHomePage';
@@ -12,6 +13,7 @@ import EventDetailPage from './Components/EventDetailPage';
 import RegistrationForm from './Components/RegistrationForm';
 import Navbar from './Components/Navbar';
 
+
 // Main App component that wraps the routing
 function AppContent() {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ function AppContent() {
   const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole') || null);
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
   const [searchTerm, setSearchTerm] = useState(''); // New state for search term
+
 
   // This effect runs once on mount to handle initial redirection based on persisted state
   // and also when isLoggedIn or userRole changes
@@ -42,6 +45,8 @@ function AppContent() {
   }, [isLoggedIn, userRole, navigate]);
 
 
+
+
   // This function handles successful logins and redirects based on role
   const handleLoginSuccess = (role) => {
     setUserRole(role);
@@ -49,6 +54,7 @@ function AppContent() {
     // Persist login state and role in localStorage
     localStorage.setItem('userRole', role);
     localStorage.setItem('isLoggedIn', 'true');
+
 
     // Navigate immediately after state update and localStorage persistence
     if (role === 'superadmin') {
@@ -59,6 +65,7 @@ function AppContent() {
       navigate('/home'); // User home page
     }
   };
+
 
   // This function handles logout
   const handleLogout = () => {
@@ -71,6 +78,7 @@ function AppContent() {
     navigate('/'); // Redirect to login page
   };
 
+
   // Component to protect routes
   const ProtectedRoute = ({ children, allowedRoles }) => {
     // If not logged in, redirect to login page
@@ -79,6 +87,7 @@ function AppContent() {
       // This is a redundant check for immediate render, but good for clarity.
       return null; // Don't render children
     }
+
 
     // If roles are specified, check if the current user's role is allowed
     if (allowedRoles && !allowedRoles.includes(userRole)) {
@@ -96,13 +105,16 @@ function AppContent() {
       return null;
     }
 
+
     return children; // Render children if logged in and authorized
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-tr from-sky-100 to-indigo-100 px-4 font-inter">
       {/* Navbar will be rendered on all pages except login */}
       {isLoggedIn && <Navbar handleLogout={handleLogout} userRole={userRole} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />}
+
 
       <Routes>
         <Route path="/" element={
@@ -111,6 +123,7 @@ function AppContent() {
             {!isLoggedIn ? <Login onLoginSuccess={handleLoginSuccess} /> : null}
           </div>
         } />
+
 
         {/* Protected Routes */}
         {/* User Role specific protection added */}
@@ -122,6 +135,7 @@ function AppContent() {
         <Route path="/register/:id" element={<ProtectedRoute allowedRoles={['user', 'admin', 'superadmin']}><RegistrationForm handleLogout={handleLogout} /></ProtectedRoute>} />
         <Route path="/superadmin" element={<ProtectedRoute allowedRoles={['superadmin']}><SuperadminDashboard handleLogout={handleLogout} /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin', 'superadmin']}><AdminDashboard handleLogout={handleLogout} /></ProtectedRoute>} />
+
 
         {/* Fallback for unknown routes */}
         <Route path="*" element={
@@ -140,6 +154,7 @@ function AppContent() {
   );
 }
 
+
 // Wrap AppContent with BrowserRouter
 function App() {
   return (
@@ -148,5 +163,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;
