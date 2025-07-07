@@ -24,14 +24,14 @@ public class AuthController {
         return "Registration sucessfull";
     }
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Map<String,String> body, HttpSession httpSession){
+    public ResponseEntity<?> login(@RequestBody Map<String,String> body, HttpSession httpSession){
 
         User user = userService.login(body.get("email"),body.get("password"));
         if (user == null){
             return ResponseEntity.status(401).body("not logged in");
         }
         httpSession.setAttribute("currentUser",user);
-        return ResponseEntity.ok("Login sucessfull");
+        return ResponseEntity.ok(user);
     }
     @GetMapping("/logout")
     public String logOut(HttpSession httpSession){
