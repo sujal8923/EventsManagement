@@ -1,7 +1,9 @@
 package com.EventManagement.Backend.Services;
 
 import com.EventManagement.Backend.Entity.User;
+import com.EventManagement.Backend.Repository.EventRegistrationRepository;
 import com.EventManagement.Backend.Repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,8 @@ import java.util.List;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private EventRegistrationRepository eventRegistrationRepository;
     public User register(User user){
         if(!List.of("USER","ADMIN","SUPER_ADMIN").contains(user.getRole())){
             user.setRole("USER");
@@ -31,9 +35,16 @@ public class UserService {
         updated.setId(id);
        return userRepository.save(updated);
     }
+    @Transactional
     public void deleteUser(Long id){
+
+        eventRegistrationRepository.deleteByUserId(id);
+
+
         userRepository.deleteById(id);
     }
+
+
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }

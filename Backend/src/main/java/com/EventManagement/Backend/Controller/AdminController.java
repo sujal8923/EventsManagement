@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin(origins = "http://localhost:5173")
+
 public class AdminController {
     @Autowired
     private UserService userService;
@@ -21,12 +21,8 @@ public class AdminController {
     private EventService eventService;
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers(HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
-        // Admin should only see users with role USER
+    public ResponseEntity<?> getAllUsers() {
+
         List<User> users = userService.getAll().stream()
                 .filter(u -> "USER".equals(u.getRole()))
                 .toList();
@@ -36,9 +32,9 @@ public class AdminController {
     @PutMapping("/user/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updated, HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
+//        if (user == null || !user.getRole().equals("ADMIN")) {
+//            return ResponseEntity.status(403).body("Access Denied");
+//        }
         if (!"USER".equals(updated.getRole())) {
             return ResponseEntity.badRequest().body("Admins can only update USER role accounts");
         }
@@ -46,25 +42,29 @@ public class AdminController {
     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            User user = userService.getUserById(id);
+            if (user == null) {
+                return ResponseEntity.status(404).body("User not found");
+            }
+
+            if (!"USER".equals(user.getRole())) {
+                return ResponseEntity.badRequest().body("Only USER role accounts can be deleted by admin.");
+            }
+
+            userService.deleteUser(id);
+            return ResponseEntity.ok("Deleted");
+        } catch (Exception e) {
+            e.printStackTrace(); // 👈 log exact error
+            return ResponseEntity.status(500).body("Server error: " + e.getMessage());
         }
-        User target = userService.getUserById(id);
-        if (!"USER".equals(target.getRole())) {
-            return ResponseEntity.badRequest().body("Admins can only delete USER role accounts");
-        }
-        userService.deleteUser(id);
-        return ResponseEntity.ok("Deleted");
     }
 
+
     @GetMapping("/events")
-    public ResponseEntity<?> getAllEvents(HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
+    public ResponseEntity<?> getAllEvents() {
+
         return ResponseEntity.ok(eventService.getAllEvent());
     }
 }

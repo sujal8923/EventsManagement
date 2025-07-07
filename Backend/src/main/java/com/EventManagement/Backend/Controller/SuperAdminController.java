@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/superadmin")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5174")
 public class SuperAdminController {
     @Autowired
     private EventService eventService;
@@ -22,60 +22,40 @@ public class SuperAdminController {
     private UserService userService;
 
     @GetMapping("/events")
-    public ResponseEntity<?> viewAllEvents(HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("SUPER_ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
+    public ResponseEntity<?> viewAllEvents() {
+
         return ResponseEntity.ok(eventService.getAllEvent());
     }
 
     @PostMapping("/event")
-    public ResponseEntity<?> addEvent(@RequestBody Event e, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("SUPER_ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
+    public ResponseEntity<?> addEvent(@RequestBody Event e) {
+
+
         return ResponseEntity.ok(eventService.addEvent(e));
     }
 
     @PutMapping("/event/{id}")
-    public ResponseEntity<?> updateEvent(@PathVariable Long id, @RequestBody Event e, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("SUPER_ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
+    public ResponseEntity<?> updateEvent(@PathVariable Long id, @RequestBody Event e) {
+
+
         return ResponseEntity.ok(eventService.updateEvent(id, e));
     }
 
     @DeleteMapping("/event/{id}")
-    public ResponseEntity<?> deleteEvent(@PathVariable Long id, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("SUPER_ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
+    public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
+
         eventService.deleteEvent(id);
         return ResponseEntity.ok("Deleted");
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<?> createAdmin(@RequestBody User newAdmin, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("SUPER_ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
-        if (!"ADMIN".equals(newAdmin.getRole())) {
-            return ResponseEntity.badRequest().body("Only admins can be created here");
-        }
+    public ResponseEntity<?> createAdmin(@RequestBody User newAdmin) {
         return ResponseEntity.ok(userService.register(newAdmin));
     }
 
     @GetMapping("/admins")
-    public ResponseEntity<?> getAllAdmins(HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("SUPER_ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
+    public ResponseEntity<?> getAllAdmins() {
+
         List<User> admins = userService.getAll().stream()
                 .filter(u -> "ADMIN".equals(u.getRole()))
                 .toList();
@@ -83,11 +63,8 @@ public class SuperAdminController {
     }
 
     @PutMapping("/admin/{id}")
-    public ResponseEntity<?> updateAdmin(@PathVariable Long id, @RequestBody User updated, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("SUPER_ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
+    public ResponseEntity<?> updateAdmin(@PathVariable Long id, @RequestBody User updated) {
+
         if (!"ADMIN".equals(updated.getRole())) {
             return ResponseEntity.badRequest().body("Only admins can be updated here");
         }
@@ -95,15 +72,12 @@ public class SuperAdminController {
     }
 
     @DeleteMapping("/admin/{id}")
-    public ResponseEntity<?> deleteAdmin(@PathVariable Long id, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("SUPER_ADMIN")) {
-            return ResponseEntity.status(403).body("Access Denied");
-        }
-        User target = userService.getUserById(id);
-        if (!"ADMIN".equals(target.getRole())) {
-            return ResponseEntity.badRequest().body("Only ADMIN accounts can be deleted by superadmin");
-        }
+    public ResponseEntity<?> deleteAdmin(@PathVariable Long id) {
+
+//        User target = userService.getUserById(id);
+//        if (!"ADMIN".equals(target.getRole())) {
+//            return ResponseEntity.badRequest().body("Only ADMIN accounts can be deleted by superadmin");
+//        }
         userService.deleteUser(id);
         return ResponseEntity.ok("Deleted");
     }

@@ -1,9 +1,6 @@
 package com.EventManagement.Backend.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class EventRegistration {
@@ -12,6 +9,7 @@ public class EventRegistration {
     @GeneratedValue
     private Long id;
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
     @ManyToOne
     private Event event;
@@ -19,7 +17,6 @@ public class EventRegistration {
     private String email;
     private String phone;
     private String college;
-
 
 
     public Long getId() {

@@ -1,5 +1,6 @@
 package com.EventManagement.Backend.Controller;
 
+import com.EventManagement.Backend.Entity.EventRegistration;
 import com.EventManagement.Backend.Entity.User;
 import com.EventManagement.Backend.Services.EventService;
 import com.EventManagement.Backend.Services.RegistrationService;
@@ -15,7 +16,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:5173",allowCredentials = "true")
 public class UserController {
     @Autowired
     private EventService eventService;
@@ -30,11 +30,11 @@ public class UserController {
     @PostMapping("/register/{eventId}")
     public ResponseEntity<?> registerEvent(
             @PathVariable Long eventId,
-            @RequestBody Map<String, String> regData,
-            HttpSession session
+            @RequestBody Map<String, String> regData
     ) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null || !user.getRole().equals("USER")) return ResponseEntity.status(403).body("Access Denied");
-        return ResponseEntity.ok(registrationService.registerUserForEvent(eventId, user, regData));
+        Long userId = Long.parseLong(regData.get("userId"));
+        EventRegistration registration = registrationService.registerUserForEvent(eventId, userId, regData);
+        if (registration == null) return ResponseEntity.badRequest().body("Invalid event or user");
+        return ResponseEntity.ok(registration);
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
     @Autowired
     private UserService userService;
@@ -41,6 +40,7 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
+        System.out.println(" my session"+user);
         if (user == null) return ResponseEntity.status(401).body("Not logged in");
         return ResponseEntity.ok(user);
     }
