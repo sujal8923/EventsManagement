@@ -44,7 +44,7 @@ function Table({ headers, data, onUpdate, onDelete, showActions = false }) {
                         <PencilIcon className="w-5 h-5" />
                       </button>
                       <button
-                        onClick={() => onDelete && onDelete(row.id)}
+                        onClick={() => onDelete && onDelete(row)}
                         className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-100 transition-colors"
                         aria-label="Delete"
                       >

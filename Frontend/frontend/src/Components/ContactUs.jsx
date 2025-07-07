@@ -7,7 +7,7 @@ function ContactUs({ navigateTo, handleLogout }) {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [status, setStatus] = useState(''); // 'success', 'error', 'loading', ''
+  const [status, setStatus] = useState('');
 
   const inputStyle =
     'w-full pl-10 p-3 rounded-md border border-gray-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:shadow-md placeholder-gray-400 transition-all';
@@ -18,20 +18,16 @@ function ContactUs({ navigateTo, handleLogout }) {
     e.preventDefault();
     setStatus('loading');
 
-    // Basic validation
     if (!name || !email || !subject || !message) {
       setStatus('error');
       return;
     }
 
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // In a real application, you would send this data to your backend
     console.log('Contact Form Submission:', { name, email, subject, message });
 
-    // Simulate success or failure
-    const success = Math.random() > 0.2; // 80% chance of success
+    const success = Math.random() > 0.2;
 
     if (success) {
       setStatus('success');
@@ -46,7 +42,7 @@ function ContactUs({ navigateTo, handleLogout }) {
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-sky-100 to-indigo-100 pt-20">
-     <Navbar handleLogout={handleLogout} />
+      <Navbar handleLogout={handleLogout} />
       <div className="flex-grow container mx-auto p-8 bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl my-8 max-w-2xl">
         <h1 className="text-4xl font-bold text-cyan-700 mb-6 text-center">Contact Us</h1>
         <p className="text-lg text-gray-700 text-center mb-8">

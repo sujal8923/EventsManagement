@@ -1,85 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Navbar from './Navbar';
 import DashboardLayout from './DashboardLayout';
 import Table from './Table';
-import FormModal from './FormModal'; // Import the FormModal component
+import FormModal from './FormModal';
 
 function SuperadminDashboard({ handleLogout }) {
-  const [activeTab, setActiveTab] = useState('admins'); // 'admins', 'users', 'events'
+  const [activeTab, setActiveTab] = useState('admins');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState('create'); // 'create', 'update'
-  const [currentFormData, setCurrentFormData] = useState(null); // Data for update form
+  const [modalType, setModalType] = useState('create');
+  const [currentFormData, setCurrentFormData] = useState(null);
 
-  // Dummy Data for Admins (Removed status, role is implied)
-  const [admins, setAdmins] = useState([
-    { id: 'admin1', username: 'adminuser1', password: 'adminpassword1' }, // Added dummy password
-    { id: 'admin2', username: 'adminuser2', password: 'adminpassword2' }, // Added dummy password
-  ]);
+  const [admins, setAdmins] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [events, setEvents] = useState([]);
 
-  // Dummy Data for Users (Removed status, role is implied)
-  const [users, setUsers] = useState([
-    { id: 'user1', username: 'john.doe' },
-    { id: 'user2', username: 'jane.smith' },
-    { id: 'user3', username: 'mike.jones' },
-  ]);
+  useEffect(() => {
+    if (activeTab === 'admins') {
+      axios.get('http://localhost:8080/superadmin/admins')
+        .then(res => setAdmins(res.data))
+        .catch(err => console.error('Error fetching admins:', err));
+    } else if (activeTab === 'users') {
+      axios.get('http://localhost:8080/admin/users')
+        .then(res => setUsers(res.data))
+        .catch(err => console.error('Error fetching users:', err));
+    } else if (activeTab === 'events') {
+      axios.get('http://localhost:8080/superadmin/events')
+        .then(res => setEvents(res.data))
+        .catch(err => console.error('Error fetching events:', err));
+    }
+  }, [activeTab]);
 
-  // Dummy Data for Events (ensure unique IDs if you add more)
-  const [events, setEvents] = useState([
-    { id: 'eventA', name: 'Annual Tech Summit', date: '2025-08-15', location: 'Virtual', status: 'Upcoming' },
-    { id: 'eventB', name: 'Startup Pitch Fest', date: '2025-09-01', location: 'Conference Hall', status: 'Upcoming' },
-    { id: 'eventC', name: 'AI & ML Workshop', date: '2025-10-20', location: 'Online', status: 'Upcoming' },
-  ]);
-
-  // Table Headers (Added 'sno' for Serial Number)
   const adminHeaders = [
-    { key: 'sno', label: 'S. No.' }, // Added S. No.
-    { key: 'username', label: 'Username' },
+    { key: 'sno', label: 'S. No.' },
+    { key: 'userName', label: 'Username' },
+    { key: 'email', label: 'Email' },
+    { key: 'role', label: 'Role' },
     { key: 'actions', label: 'Actions' },
   ];
 
   const userHeaders = [
-    { key: 'sno', label: 'S. No.' }, // Added S. No.
-    { key: 'username', label: 'Username' },
-    { key: 'actions', label: 'Actions' },
+    { key: 'sno', label: 'S. No.' },
+    { key: 'userName', label: 'Username' },
+    { key: 'email', label: 'Email' },
+    { key: 'role', label: 'Role' }
   ];
 
   const eventHeaders = [
-    { key: 'sno', label: 'S. No.' }, // Added S. No.
-    { key: 'name', label: 'Event Name' },
+    { key: 'sno', label: 'S. No.' },
+    { key: 'title', label: 'Event Name' },
     { key: 'date', label: 'Date' },
     { key: 'location', label: 'Location' },
-    { key: 'status', label: 'Status' },
     { key: 'actions', label: 'Actions' },
   ];
 
-  // Form field definitions (no change needed here for S. No.)
   const adminFormFields = [
-    { name: 'username', label: 'Username', type: 'text', required: true },
+    { name: 'userName', label: 'Username', type: 'text', required: true },
+    { name: 'email', label: 'Email', type: 'email', required: true },
     { name: 'password', label: 'Password', type: 'password', required: true },
     { name: 'confirmPassword', label: 'Confirm Password', type: 'password', required: true },
+    { name: 'role', label: 'Role', type: 'text', required: true, defaultValue: 'Admin' },
   ];
 
   const userFormFields = [
-    { name: 'username', label: 'Username', type: 'text', required: true },
+    { name: 'userName', label: 'Username', type: 'text', required: true },
+    { name: 'email', label: 'Email', type: 'email', required: true },
+    { name: 'password', label: 'Password', type: 'password', required: true },
+    { name: 'role', label: 'Role', type: 'text', required: true, defaultValue: 'User' },
   ];
 
   const eventFormFields = [
-    { name: 'name', label: 'Event Name', type: 'text', required: true },
+    { name: 'title', label: 'Event Name', type: 'text', required: true },
     { name: 'date', label: 'Date', type: 'date', required: true },
     { name: 'location', label: 'Location', type: 'text', required: true },
-    { name: 'status', label: 'Status', type: 'text', required: true },
     { name: 'description', label: 'Description', type: 'textarea', required: false },
-    { name: 'imageUrl', label: 'Image URL', type: 'text', required: false },
-    { name: 'timings', label: 'Timings', type: 'text', required: false },
+    { name: 'imageUrl', label: 'Image URL', type: 'text', required: false }
   ];
 
-  // Handlers for opening modals
   const handleCreate = () => {
     setModalType('create');
     if (activeTab === 'admins') {
-      setCurrentFormData({ role: 'Admin', username: '', password: '', confirmPassword: '' });
+      setCurrentFormData({ role: 'ADMIN', userName: '', email: '', password: '', confirmPassword: '' });
     } else if (activeTab === 'users') {
-      setCurrentFormData({ role: 'User', username: '' });
+      setCurrentFormData({ role: 'User', userName: '', email: '', password: '' });
+    } else if (activeTab === 'events') {
+      setCurrentFormData({ title: '', date: '', location: '', description: '', imageUrl: '' });
     } else {
       setCurrentFormData(null);
     }
@@ -95,50 +100,69 @@ function SuperadminDashboard({ handleLogout }) {
   const handleDelete = (idToDelete) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       if (activeTab === 'admins') {
-        setAdmins(admins.filter(admin => admin.id !== idToDelete));
+        axios.delete(`http://localhost:8080/superadmin/admin/${idToDelete}`)
+          .then(() => {
+            setAdmins(admins.filter(admin => admin.id !== idToDelete));
+          })
+          .catch(err => console.error('Error deleting admin:', err));
       } else if (activeTab === 'users') {
         setUsers(users.filter(user => user.id !== idToDelete));
       } else if (activeTab === 'events') {
-        setEvents(events.filter(event => event.id !== idToDelete));
+        axios.delete(`http://localhost:8080/superadmin/event/${idToDelete}`)
+          .then(() => {
+            setEvents(events.filter(event => event.id !== idToDelete));
+          })
+          .catch(err => console.error('Error deleting event:', err));
       }
     }
   };
 
-  // Handler for form submission from modal
   const handleFormSubmit = (formData) => {
     if (activeTab === 'admins' && formData.password !== formData.confirmPassword) {
       alert('Passwords do not match!');
       return;
     }
-
     const { confirmPassword, ...dataToSave } = formData;
 
     if (modalType === 'create') {
-      const newId = `${activeTab.slice(0, -1)}${Date.now()}`;
-      let newItem = { id: newId, ...dataToSave };
-
       if (activeTab === 'admins') {
-        newItem = { ...newItem, role: 'Admin' };
-        setAdmins([...admins, newItem]);
-      } else if (activeTab === 'users') {
-        newItem = { ...newItem, role: 'User' };
-        setUsers([...users, newItem]);
+        axios.post('http://localhost:8080/register', dataToSave)
+          .then(() => {
+            axios.get('http://localhost:8080/superadmin/admins')
+              .then(res => setAdmins(res.data))
+              .catch(err => console.error('Error refreshing admins:', err));
+            setIsModalOpen(false);
+          })
+          .catch(err => console.error('Error creating admin:', err));
       } else if (activeTab === 'events') {
-        setEvents([...events, newItem]);
+        axios.post('http://localhost:8080/superadmin/event', dataToSave)
+          .then(() => {
+            axios.get('http://localhost:8080/superadmin/events')
+              .then(res => setEvents(res.data))
+              .catch(err => console.error('Error refreshing events:', err));
+            setIsModalOpen(false);
+          })
+          .catch(err => console.error('Error creating event:', err));
       }
-    } else { // modalType === 'update'
+    } else {
       if (activeTab === 'admins') {
-        setAdmins(admins.map(admin => admin.id === dataToSave.id ? { ...dataToSave, role: 'Admin' } : admin));
-      } else if (activeTab === 'users') {
-        setUsers(users.map(user => user.id === dataToSave.id ? { ...dataToSave, role: 'User' } : user));
+        axios.put(`http://localhost:8080/superadmin/admin/${dataToSave.id}`, dataToSave)
+          .then(res => {
+            setAdmins(admins.map(admin => admin.id === res.data.id ? res.data : admin));
+            setIsModalOpen(false);
+          })
+          .catch(err => console.error('Error updating admin:', err));
       } else if (activeTab === 'events') {
-        setEvents(events.map(event => event.id === dataToSave.id ? dataToSave : event));
+        axios.put(`http://localhost:8080/superadmin/event/${dataToSave.id}`, dataToSave)
+          .then(res => {
+            setEvents(events.map(event => event.id === res.data.id ? res.data : event));
+            setIsModalOpen(false);
+          })
+          .catch(err => console.error('Error updating event:', err));
       }
     }
-    setIsModalOpen(false);
   };
 
-  // Determine which data and headers to display based on activeTab
   let currentData = [];
   let currentHeaders = [];
   let currentFormFields = [];
@@ -187,13 +211,12 @@ function SuperadminDashboard({ handleLogout }) {
         <Table
           headers={currentHeaders}
           data={currentData}
-          onUpdate={handleUpdate}
-          onDelete={handleDelete}
-          showActions={true}
+          onUpdate={activeTab === 'users' ? undefined : handleUpdate}
+          onDelete={activeTab === 'users' ? undefined : handleDelete}
+          showActions={activeTab !== 'users'}
         />
       </DashboardLayout>
 
-      {/* Form Modal */}
       <FormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -1,47 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import DashboardLayout from './DashboardLayout';
 import Table from './Table';
 import FormModal from './FormModal';
+import axios from 'axios';
 
 function AdminDashboard({ handleLogout }) {
-  const [activeTab, setActiveTab] = useState('events'); // 'events', 'users'
+  const [activeTab, setActiveTab] = useState('events'); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('create');
   const [currentFormData, setCurrentFormData] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [users, setUsers] = useState([]);
 
-  // Dummy Data for Events
-  const [events, setEvents] = useState([
-    { id: 'event1', name: 'Community Cleanup', date: '2025-07-20', location: 'Central Park', status: 'Upcoming' },
-    { id: 'event2', name: 'Charity Run', date: '2025-08-10', location: 'City Stadium', status: 'Upcoming' },
-  ]);
+  useEffect(() => {
+    if (activeTab === 'events') {
+      axios.get('http://localhost:8080/admin/events')
+        .then((res) => setEvents(res.data))
+        .catch((err) => console.error('Error fetching events:', err));
+    } else if (activeTab === 'users') {
+      axios.get('http://localhost:8080/admin/users')
+        .then((res) => setUsers(res.data))
+        .catch((err) => console.error('Error fetching users:', err));
+    }
+  }, [activeTab]);
 
-  // Dummy Data for Users (Updated to use username)
-  const [users, setUsers] = useState([
-    { id: 'userA', username: 'charlie.user' },
-    { id: 'userB', username: 'diana.user' },
-    { id: 'userC', username: 'eve.user' },
-    { id: 'userD', username: 'frank.user' },
-  ]);
-
-  // Table Headers
   const eventHeaders = [
     { key: 'sno', label: 'S. No.' },
-    { key: 'name', label: 'Event Name' },
+    { key: 'title', label: 'Event Name' },
     { key: 'date', label: 'Date' },
-    { key: 'location', label: 'Location' },
-    { key: 'status', label: 'Status' },
-    // Actions column explicitly removed for events (read-only for admin)
+    { key: 'location', label: 'Location' }
   ];
 
-  // User Headers (Actions column RE-ADDED for users)
   const userHeaders = [
     { key: 'sno', label: 'S. No.' },
-    { key: 'username', label: 'Username' },
-    { key: 'actions', label: 'Actions' }, // Actions column re-added for users
+    { key: 'userName', label: 'Username' },
+    { key: 'email', label: 'Email' },
+    { key: 'role', label: 'Role' },
+    { key: 'actions', label: 'Actions' },
   ];
 
-  // Form field definitions
   const eventFormFields = [
     { name: 'name', label: 'Event Name', type: 'text', required: true },
     { name: 'date', label: 'Date', type: 'date', required: true },
@@ -52,19 +50,19 @@ function AdminDashboard({ handleLogout }) {
     { name: 'timings', label: 'Timings', type: 'text', required: false },
   ];
 
-  // User form fields (only username, as password is handled by signup)
   const userFormFields = [
-    { name: 'username', label: 'Username', type: 'text', required: true },
+    { name: 'userName', label: 'Username', type: 'text', required: true },
+    { name: 'email', label: 'Email', type: 'email', required: true },
+    { name: 'password', label: 'Password', type: 'password', required: true },
+    { name: 'role', label: 'Role', type: 'text', required: true },
   ];
 
-  // Handlers for opening modals
   const handleCreate = () => {
     setModalType('create');
     if (activeTab === 'users') {
-      setCurrentFormData({ role: 'User', username: '' }); // Default role for new user
+      setCurrentFormData({ role: 'User', userName: '', email: '', password: '' }); 
       setIsModalOpen(true);
     }
-    // Admins cannot create events, so no 'else if (activeTab === 'events')' here
   };
 
   const handleUpdate = (data) => {
@@ -74,61 +72,67 @@ function AdminDashboard({ handleLogout }) {
   };
 
   const handleDelete = (idToDelete) => {
+    console.log(idToDelete.id)
+    const id = idToDelete.id
     if (window.confirm('Are you sure you want to delete this item?')) {
       if (activeTab === 'events') {
-        // Admins cannot delete events (read-only)
         console.log("Admin cannot delete events (read-only).");
       } else if (activeTab === 'users') {
-        // Admins CAN delete users
-        setUsers(users.filter(user => user.id !== idToDelete));
+        axios.delete(`http://localhost:8080/admin/user/${id}`)
+          .then(() => setUsers(users.filter(user => user.id !== id)))
+          .catch((err) => console.error('Error deleting user:', err));
       }
     }
   };
 
-  // Handler for form submission from modal
   const handleFormSubmit = (formData) => {
     if (modalType === 'create') {
       const newId = `${activeTab.slice(0, -1)}${Date.now()}`;
       let newItem = { id: newId, ...formData };
 
       if (activeTab === 'events') {
-        // Admins cannot create events
         console.log("Admin cannot create events.");
       } else if (activeTab === 'users') {
-        newItem = { ...newItem, role: 'User' }; // Implicitly set role for new user
+        newItem = { ...newItem, role: 'User' };
         setUsers([...users, newItem]);
       }
-    } else { // modalType === 'update'
+    } else {
       if (activeTab === 'events') {
-        // Admins cannot update events
         console.log("Admin cannot update events.");
       } else if (activeTab === 'users') {
-        // Admins CAN update users
-        setUsers(users.map(user => user.id === formData.id ? { ...formData, role: 'User' } : user));
+        axios.put(`http://localhost:8080/admin/user/${formData.id}`, formData)
+          .then((res) => {
+            setUsers(users.map(user => user.id === formData.id ? res.data : user));
+            setIsModalOpen(false);
+          })
+          .catch((err) => {
+            console.error('Update failed:', err);
+            alert('Failed to update user.');
+          });
+        return;
       }
     }
     setIsModalOpen(false);
   };
 
-  // Determine which data and headers to display based on activeTab
   let currentData = [];
   let currentHeaders = [];
   let currentFormFields = [];
   let modalTitle = "";
-  let showCreateButton = false; // Control visibility of create button
+  let showCreateButton = false;
 
   if (activeTab === 'events') {
     currentData = events;
     currentHeaders = eventHeaders;
-    currentFormFields = eventFormFields; // Form fields are still defined for consistency, even if not used for creation
+    currentFormFields = eventFormFields;
     modalTitle = modalType === 'create' ? 'Create New Event' : 'Update Event';
-    showCreateButton = false; // Admins CANNOT create events
+    showCreateButton = false;
   } else if (activeTab === 'users') {
     currentData = users;
     currentHeaders = userHeaders;
     currentFormFields = userFormFields;
     modalTitle = modalType === 'create' ? 'Create New User' : 'Update User';
-    showCreateButton = true; // Admins CAN create users
+    showCreateButton = true;
   }
 
   const tabs = [
@@ -145,25 +149,13 @@ function AdminDashboard({ handleLogout }) {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       >
-        {/* Conditionally render Create button based on activeTab */}
-        {showCreateButton && (
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={handleCreate}
-              className="p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
-            >
-              Create New {activeTab === 'events' ? 'Event' : 'User'}
-            </button>
-          </div>
-        )}
+       
         <Table
           headers={currentHeaders}
           data={currentData}
-          // Pass onUpdate/onDelete only if activeTab is 'users'
           onUpdate={activeTab === 'users' ? handleUpdate : null}
           onDelete={activeTab === 'users' ? handleDelete : null}
-          // showActions controls the column visibility; buttons are controlled by onUpdate/onDelete
-          showActions={activeTab === 'users'} // Show actions column ONLY for users tab
+          showActions={activeTab === 'users'}
         />
       </DashboardLayout>
 

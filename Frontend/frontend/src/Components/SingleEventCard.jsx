@@ -1,6 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function SingleEventCard() {
+  let navi = useNavigate();
+  const naviToForm = (e)=>{
+    navi(`/register/:${e}`); 
+
+  }
+
   const event = {
     title: "Campus DevConnect 2025",
     image: "https://via.placeholder.com/300x120.png?text=DevConnect",
@@ -43,7 +50,8 @@ function SingleEventCard() {
         </div>
 
         <button
-          onClick={() => alert(`Registered for: ${event.title}`)}
+          // onClick={() => alert(`Registered for: ${event.title}`)}
+          onClick={()=> naviToForm(event?.id)}
           className="mt-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
         >
           Register
