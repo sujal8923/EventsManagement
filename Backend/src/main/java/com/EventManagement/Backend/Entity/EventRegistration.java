@@ -19,15 +19,8 @@ public class EventRegistration {
     private String email;
     private String phone;
     private String college;
-    private String location;
 
-    public String getLocation() {
-        return location;
-    }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
 
     public Long getId() {
         return id;
