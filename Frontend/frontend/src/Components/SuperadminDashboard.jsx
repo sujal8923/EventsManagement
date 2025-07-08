@@ -21,7 +21,7 @@ function SuperadminDashboard({ handleLogout }) {
         .then(res => setAdmins(res.data))
         .catch(err => console.error('Error fetching admins:', err));
     } else if (activeTab === 'users') {
-      axios.get('http://localhost:8080/admin/users')
+      axios.get('http://localhost:8080/superadmin/users')
         .then(res => setUsers(res.data))
         .catch(err => console.error('Error fetching users:', err));
     } else if (activeTab === 'events') {
@@ -100,17 +100,21 @@ function SuperadminDashboard({ handleLogout }) {
   const handleDelete = (idToDelete) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       if (activeTab === 'admins') {
-        axios.delete(`http://localhost:8080/superadmin/admin/${idToDelete}`)
+        axios.delete(`http://localhost:8080/superadmin/admin/${idToDelete.id}`)
           .then(() => {
-            setAdmins(admins.filter(admin => admin.id !== idToDelete));
+            axios.get('http://localhost:8080/superadmin/admins')
+              .then(res => setAdmins(res.data))
+              .catch(err => console.error('Error refreshing admins:', err));
           })
           .catch(err => console.error('Error deleting admin:', err));
       } else if (activeTab === 'users') {
         setUsers(users.filter(user => user.id !== idToDelete));
       } else if (activeTab === 'events') {
-        axios.delete(`http://localhost:8080/superadmin/event/${idToDelete}`)
+        axios.delete(`http://localhost:8080/superadmin/event/${idToDelete.id}`)
           .then(() => {
-            setEvents(events.filter(event => event.id !== idToDelete));
+            axios.get('http://localhost:8080/superadmin/events')
+              .then(res => setEvents(res.data))
+              .catch(err => console.error('Error refreshing events:', err));
           })
           .catch(err => console.error('Error deleting event:', err));
       }
@@ -126,7 +130,7 @@ function SuperadminDashboard({ handleLogout }) {
 
     if (modalType === 'create') {
       if (activeTab === 'admins') {
-        axios.post('http://localhost:8080/register', dataToSave)
+        axios.post('http://localhost:8080/superadmin/admin', dataToSave)
           .then(() => {
             axios.get('http://localhost:8080/superadmin/admins')
               .then(res => setAdmins(res.data))
@@ -200,14 +204,14 @@ function SuperadminDashboard({ handleLogout }) {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       >
-        <div className="flex justify-end mb-4">
+        {/* <div className="flex justify-end mb-4">
           <button
             onClick={handleCreate}
             className="p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
           >
             Create New {activeTab === 'admins' ? 'Admin' : activeTab === 'users' ? 'User' : 'Event'}
           </button>
-        </div>
+        </div> */}
         <Table
           headers={currentHeaders}
           data={currentData}

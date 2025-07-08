@@ -17,7 +17,7 @@ function Login({ setLoggedIn,setLogin,setUserId }) {
     email: '',
     password: '',
   });
-
+console.log(loginForm)
 
 
   const [signupForm, setSignupForm] = useState({

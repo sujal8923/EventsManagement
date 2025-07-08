@@ -7,12 +7,11 @@ function EventDetailPage({ handleLogout }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const eventType = searchParams.get('type'); 
+  const eventType = searchParams.get('type');
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch events from backend
   useEffect(() => {
     axios.get('http://localhost:8080/user/event')
       .then((response) => {
@@ -25,7 +24,8 @@ function EventDetailPage({ handleLogout }) {
       });
   }, []);
 
-  const event = events.find(e => e.id === Number(id)); 
+  const event = events.find(e => e.id === Number(id));
+  const isEventPast = event && new Date(event.date) < new Date(); // ✅ Check if past
 
   if (loading) {
     return <div className="text-center p-20 text-xl text-gray-600">Loading event...</div>;

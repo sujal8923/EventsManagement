@@ -71,7 +71,7 @@ function Navbar({   searchTerm, setSearchTerm }) {
       
         <div className="flex items-center space-x-4 md:ml-auto">
           
-            <div className="relative">
+            {/* <div className="relative">
               <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
@@ -88,7 +88,7 @@ function Navbar({   searchTerm, setSearchTerm }) {
                   }
                 }}
               />
-            </div>
+            </div> */}
           {/* )} */}
           <button
             onClick={logs}

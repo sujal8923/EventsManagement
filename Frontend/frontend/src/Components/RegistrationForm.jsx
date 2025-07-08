@@ -16,10 +16,8 @@ console.log(userId)
     email: '',
     phone: '',
     college: '',
-    
-    
   });
-
+console.log(formData)
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -32,11 +30,10 @@ console.log(userId)
   const handleSubmit = () => {
     const payload = {
     ...formData,
-  
   };
     axios
       .post(`http://localhost:8080/user/register/${id}`,payload, {
-        withCredentials: true, 
+        
       })
       .then((response) => {
         alert('Registration successful!');
