@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5174")
 public class AuthController {
     @Autowired
     private UserService userService;
@@ -23,15 +24,22 @@ public class AuthController {
         return "Registration sucessfull";
     }
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String,String> body, HttpSession httpSession){
+public ResponseEntity<?> login(@RequestBody Map<String,String> body) {
+    try {
+        String email = body.get("email");
+        String password = body.get("password");
 
-        User user = userService.login(body.get("email"),body.get("password"));
-        if (user == null){
-            return ResponseEntity.status(401).body("not logged in");
+        User user = userService.login(email, password);
+        if (user == null) {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
-        httpSession.setAttribute("currentUser",user);
         return ResponseEntity.ok(user);
+    } catch (Exception e) {
+        e.printStackTrace(); // 👈 Check this in backend console
+        return ResponseEntity.status(500).body("Server error: " + e.getMessage());
     }
+}
+
     @GetMapping("/logout")
     public String logOut(HttpSession httpSession){
         httpSession.invalidate();

@@ -16,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = "http://localhost:5174",methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 public class UserController {
     @Autowired
     private EventService eventService;

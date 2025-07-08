@@ -13,11 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/superadmin")
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5174", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 public class SuperAdminController {
     @Autowired
     private EventService eventService;
-
     @Autowired
     private UserService userService;
 
@@ -73,12 +72,16 @@ public class SuperAdminController {
 
     @DeleteMapping("/admin/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable Long id) {
-
-//        User target = userService.getUserById(id);
-//        if (!"ADMIN".equals(target.getRole())) {
-//            return ResponseEntity.badRequest().body("Only ADMIN accounts can be deleted by superadmin");
-//        }
         userService.deleteUser(id);
         return ResponseEntity.ok("Deleted");
     }
+    
+@GetMapping("/users")
+public ResponseEntity<?> getAllUsers() {
+    List<User> allUsers = userService.getAll().stream()
+            .filter(u -> "USER".equalsIgnoreCase(u.getRole()))
+            .toList();
+    return ResponseEntity.ok(allUsers);
+}
+
 }

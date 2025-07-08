@@ -1,6 +1,7 @@
 package com.EventManagement.Backend.Services;
 
 import com.EventManagement.Backend.Entity.Event;
+import com.EventManagement.Backend.Repository.EventRegistrationRepository;
 import com.EventManagement.Backend.Repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,9 @@ import java.util.List;
 public class EventService {
     @Autowired
     private EventRepository eventRepository;
+    @Autowired
+    private EventRegistrationRepository eventRegistrationRepository;
+    
     public Event addEvent(Event event){
        return eventRepository.save(event);
     }
@@ -22,7 +26,9 @@ public class EventService {
       return   eventRepository.save(updated);
     }
     public void deleteEvent(Long id){
+      // eventRegistrationRepository.deleteByEventId(id); 
          eventRepository.deleteById(id);
+
     }
 
 }

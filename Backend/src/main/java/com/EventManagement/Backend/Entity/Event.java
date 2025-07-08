@@ -1,8 +1,14 @@
 package com.EventManagement.Backend.Entity;
 
+
+import java.util.List;
+
+import org.hibernate.annotations.CascadeType;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Event {
@@ -14,6 +20,8 @@ public class Event {
     private String description;
     private String location;
     private String date;
+    @OneToMany(mappedBy = "event", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+private List<EventRegistration> registrations;
 
     public String getLocation() {
         return location;
