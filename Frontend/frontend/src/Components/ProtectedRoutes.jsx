@@ -5,7 +5,7 @@ function ProtectedRoutes({allowedRoles, children}) {
     // if
   return (
     <div>
-      
+      <h1>hii</h1>
     </div>
   )
 }
