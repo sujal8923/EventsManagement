@@ -39,7 +39,6 @@ function AppContent() {
         <Route path="/register/:id" element={<RegistrationForm  userId={userId} />} />
         <Route path="/superadmin" element={<SuperadminDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
-
         {/* 404 fallback */}
         <Route
           path="*"

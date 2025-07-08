@@ -15,8 +15,8 @@ function Navbar({   searchTerm, setSearchTerm }) {
     res.then((response)=>{
         alert('Logout successful');
         localStorage.setItem('loggedIn', 'false');
+        localStorage.removeItem('userRole');
 
-  
         navigate('/');
     })
   }

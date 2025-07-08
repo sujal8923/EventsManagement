@@ -30,11 +30,8 @@ public class AdminController {
     }
 
     @PutMapping("/user/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updated, HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-//        if (user == null || !user.getRole().equals("ADMIN")) {
-//            return ResponseEntity.status(403).body("Access Denied");
-//        }
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updated) {
+        
         if (!"USER".equals(updated.getRole())) {
             return ResponseEntity.badRequest().body("Admins can only update USER role accounts");
         }

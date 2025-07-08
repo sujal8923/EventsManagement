@@ -4,7 +4,6 @@ import com.EventManagement.Backend.Entity.Event;
 import com.EventManagement.Backend.Entity.User;
 import com.EventManagement.Backend.Services.EventService;
 import com.EventManagement.Backend.Services.UserService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
