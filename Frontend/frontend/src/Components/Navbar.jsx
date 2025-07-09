@@ -10,16 +10,14 @@ function Navbar({   searchTerm, setSearchTerm }) {
   const iconClass = "w-5 h-5";
 
 
-  let logs = ()=>{
-    const res = axios.get('http://localhost:8080/logout');
-    res.then((response)=>{
-        alert('Logout successful');
-        localStorage.setItem('loggedIn', 'false');
-        localStorage.removeItem('userRole');
-
-        navigate('/');
-    })
-  }
+  const logs = () => {
+  localStorage.removeItem('token');       // Remove JWT token
+  localStorage.removeItem('userRole');    // Remove stored role
+  localStorage.setItem('loggedIn', 'false');
+  alert('Logout successful');
+  navigate('/');  
+                        
+};
   let role = localStorage.getItem('userRole');
 
   return (

@@ -6,7 +6,7 @@ import FormModal from './FormModal';
 import axios from 'axios';
 
 function AdminDashboard({ handleLogout }) {
-  const [activeTab, setActiveTab] = useState('events'); 
+  const [activeTab, setActiveTab] = useState('events');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('create');
   const [currentFormData, setCurrentFormData] = useState(null);
@@ -14,12 +14,22 @@ function AdminDashboard({ handleLogout }) {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+
     if (activeTab === 'events') {
-      axios.get('http://localhost:8080/admin/events')
+      axios.get('http://localhost:8080/admin/events', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((res) => setEvents(res.data))
         .catch((err) => console.error('Error fetching events:', err));
     } else if (activeTab === 'users') {
-      axios.get('http://localhost:8080/admin/users')
+      axios.get('http://localhost:8080/admin/users', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((res) => setUsers(res.data))
         .catch((err) => console.error('Error fetching users:', err));
     }
@@ -60,7 +70,7 @@ function AdminDashboard({ handleLogout }) {
   const handleCreate = () => {
     setModalType('create');
     if (activeTab === 'users') {
-      setCurrentFormData({ role: 'User', userName: '', email: '', password: '' }); 
+      setCurrentFormData({ role: 'User', userName: '', email: '', password: '' });
       setIsModalOpen(true);
     }
   };
@@ -72,13 +82,18 @@ function AdminDashboard({ handleLogout }) {
   };
 
   const handleDelete = (idToDelete) => {
-    console.log(idToDelete.id)
-    const id = idToDelete.id
+    const token = localStorage.getItem('token');
+    const id = idToDelete.id;
+
     if (window.confirm('Are you sure you want to delete this item?')) {
       if (activeTab === 'events') {
         console.log("Admin cannot delete events (read-only).");
       } else if (activeTab === 'users') {
-        axios.delete(`http://localhost:8080/admin/user/${id}`)
+        axios.delete(`http://localhost:8080/admin/user/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
           .then(() => setUsers(users.filter(user => user.id !== id)))
           .catch((err) => console.error('Error deleting user:', err));
       }
@@ -86,6 +101,8 @@ function AdminDashboard({ handleLogout }) {
   };
 
   const handleFormSubmit = (formData) => {
+    const token = localStorage.getItem('token');
+
     if (modalType === 'create') {
       const newId = `${activeTab.slice(0, -1)}${Date.now()}`;
       let newItem = { id: newId, ...formData };
@@ -94,13 +111,17 @@ function AdminDashboard({ handleLogout }) {
         console.log("Admin cannot create events.");
       } else if (activeTab === 'users') {
         newItem = { ...newItem, role: 'User' };
-        setUsers([...users, newItem]);
+        setUsers([...users, newItem]); // Frontend-only for now
       }
     } else {
       if (activeTab === 'events') {
         console.log("Admin cannot update events.");
       } else if (activeTab === 'users') {
-        axios.put(`http://localhost:8080/admin/user/${formData.id}`, formData)
+        axios.put(`http://localhost:8080/admin/user/${formData.id}`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
           .then((res) => {
             setUsers(users.map(user => user.id === formData.id ? res.data : user));
             setIsModalOpen(false);
@@ -112,6 +133,7 @@ function AdminDashboard({ handleLogout }) {
         return;
       }
     }
+
     setIsModalOpen(false);
   };
 
@@ -149,13 +171,14 @@ function AdminDashboard({ handleLogout }) {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       >
-       
         <Table
           headers={currentHeaders}
           data={currentData}
           onUpdate={activeTab === 'users' ? handleUpdate : null}
           onDelete={activeTab === 'users' ? handleDelete : null}
           showActions={activeTab === 'users'}
+          showCreateButton={showCreateButton}
+          onCreate={handleCreate}
         />
       </DashboardLayout>
 

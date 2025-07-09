@@ -2,54 +2,43 @@ package com.EventManagement.Backend.Controller;
 
 import com.EventManagement.Backend.Entity.User;
 import com.EventManagement.Backend.Services.UserService;
-import jakarta.servlet.http.HttpSession;
+import com.EventManagement.Backend.config.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5174")
+// @CrossOrigin(origins = "http://localhost:5173 ", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class AuthController {
-    @Autowired
-    private UserService userService;
-    @PostMapping("/register")
-    public String register(@RequestBody User user){
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            user.setRole("USER");
-        }
+    @Autowired private AuthenticationManager authManager;
+    @Autowired private JwtUtil jwtUtil;
+    @Autowired private UserService userService;
 
-        userService.register(user);
-        return "Registration sucessfull";
-    }
     @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody Map<String,String> body) {
-    try {
-        String email = body.get("email");
-        String password = body.get("password");
+    public ResponseEntity<?> login(@RequestBody Map<String,String> creds) {
+        Authentication auth = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(creds.get("email"), creds.get("password")));
 
-        User user = userService.login(email, password);
-        if (user == null) {
-            return ResponseEntity.status(401).body("Invalid credentials");
-        }
-        return ResponseEntity.ok(user);
-    } catch (Exception e) {
-        e.printStackTrace(); // 👈 Check this in backend console
-        return ResponseEntity.status(500).body("Server error: " + e.getMessage());
-    }
-}
+        User user = userService.findByEmail(creds.get("email"));
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
-    @GetMapping("/logout")
-    public String logOut(HttpSession httpSession){
-        httpSession.invalidate();
-        return "logout sucess";
+        return ResponseEntity.ok(Map.of("token", token, "role", user.getRole(),"userId",user.getId()));
     }
-    @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
-        System.out.println(" my session"+user);
-        if (user == null) return ResponseEntity.status(401).body("Not logged in");
-        return ResponseEntity.ok(user);
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User user) {
+        user.setRole(user.getRole() == null || user.getRole().isBlank() ? "USER" : user.getRole());
+        userService.register(user);
+        return ResponseEntity.ok("Registered");
     }
 }

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Import all your components
 import Login from "./Components/Login";
-import UserHomePage from "./Components/UserHomePage";
+// import UserHomePage from "./Components/UserHomePage";
 import SuperadminDashboard from "./Components/SuperadminDashboard";
 import AdminDashboard from "./Components/AdminDashboard";
 import AboutUs from "./Components/AboutUs";
@@ -12,6 +12,7 @@ import EventDetailPage from "./Components/EventDetailPage";
 import RegistrationForm from "./Components/RegistrationForm";
 import Navbar from "./Components/Navbar";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
+import UserHomePage from "./Components/UserHomePage";
 
 function AppContent() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,7 +21,7 @@ function AppContent() {
   const [login, setLogin] = useState(false);
   const storedLogin = localStorage.getItem("loggedIn");
   const [userId, setUserId] = useState(null);
-
+  console.log(localStorage.getItem("userRole"));
   return (
     <div className="min-h-screen bg-gradient-to-tr from-sky-100 to-indigo-100 px-4 font-inter">
       {loggedIn && storedLogin === true ? (
@@ -47,6 +48,7 @@ function AppContent() {
         <Route
           path="/home"
           element={
+            // <UserHomePage/>
             <ProtectedRoutes allowedRoles={["USER"]}>
               <UserHomePage searchTerm={searchTerm} />
             </ProtectedRoutes>

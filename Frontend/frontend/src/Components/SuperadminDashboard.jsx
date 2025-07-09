@@ -15,17 +15,20 @@ function SuperadminDashboard({ handleLogout }) {
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
 
+  const token = localStorage.getItem('token');
+
   useEffect(() => {
+    const headers = { Authorization: `Bearer ${token}` };
     if (activeTab === 'admins') {
-      axios.get('http://localhost:8080/superadmin/admins')
+      axios.get('http://localhost:8080/superadmin/admins', { headers })
         .then(res => setAdmins(res.data))
         .catch(err => console.error('Error fetching admins:', err));
     } else if (activeTab === 'users') {
-      axios.get('http://localhost:8080/superadmin/users')
+      axios.get('http://localhost:8080/superadmin/users', { headers })
         .then(res => setUsers(res.data))
         .catch(err => console.error('Error fetching users:', err));
     } else if (activeTab === 'events') {
-      axios.get('http://localhost:8080/superadmin/events')
+      axios.get('http://localhost:8080/superadmin/events', { headers })
         .then(res => setEvents(res.data))
         .catch(err => console.error('Error fetching events:', err));
     }
@@ -98,21 +101,23 @@ function SuperadminDashboard({ handleLogout }) {
   };
 
   const handleDelete = (idToDelete) => {
+    const headers = { Authorization: `Bearer ${token}` };
+
     if (window.confirm('Are you sure you want to delete this item?')) {
       if (activeTab === 'admins') {
-        axios.delete(`http://localhost:8080/superadmin/admin/${idToDelete.id}`)
+        axios.delete(`http://localhost:8080/superadmin/admin/${idToDelete.id}`, { headers })
           .then(() => {
-            axios.get('http://localhost:8080/superadmin/admins')
+            axios.get('http://localhost:8080/superadmin/admins', { headers })
               .then(res => setAdmins(res.data))
               .catch(err => console.error('Error refreshing admins:', err));
           })
           .catch(err => console.error('Error deleting admin:', err));
       } else if (activeTab === 'users') {
-        setUsers(users.filter(user => user.id !== idToDelete));
+        setUsers(users.filter(user => user.id !== idToDelete.id));
       } else if (activeTab === 'events') {
-        axios.delete(`http://localhost:8080/superadmin/event/${idToDelete.id}`)
+        axios.delete(`http://localhost:8080/superadmin/event/${idToDelete.id}`, { headers })
           .then(() => {
-            axios.get('http://localhost:8080/superadmin/events')
+            axios.get('http://localhost:8080/superadmin/events', { headers })
               .then(res => setEvents(res.data))
               .catch(err => console.error('Error refreshing events:', err));
           })
@@ -122,26 +127,29 @@ function SuperadminDashboard({ handleLogout }) {
   };
 
   const handleFormSubmit = (formData) => {
+    const headers = { Authorization: `Bearer ${token}` };
+
     if (activeTab === 'admins' && formData.password !== formData.confirmPassword) {
       alert('Passwords do not match!');
       return;
     }
+
     const { confirmPassword, ...dataToSave } = formData;
 
     if (modalType === 'create') {
       if (activeTab === 'admins') {
-        axios.post('http://localhost:8080/superadmin/admin', dataToSave)
+        axios.post('http://localhost:8080/superadmin/admin', dataToSave, { headers })
           .then(() => {
-            axios.get('http://localhost:8080/superadmin/admins')
+            axios.get('http://localhost:8080/superadmin/admins', { headers })
               .then(res => setAdmins(res.data))
               .catch(err => console.error('Error refreshing admins:', err));
             setIsModalOpen(false);
           })
           .catch(err => console.error('Error creating admin:', err));
       } else if (activeTab === 'events') {
-        axios.post('http://localhost:8080/superadmin/event', dataToSave)
+        axios.post('http://localhost:8080/superadmin/event', dataToSave, { headers })
           .then(() => {
-            axios.get('http://localhost:8080/superadmin/events')
+            axios.get('http://localhost:8080/superadmin/events', { headers })
               .then(res => setEvents(res.data))
               .catch(err => console.error('Error refreshing events:', err));
             setIsModalOpen(false);
@@ -150,14 +158,14 @@ function SuperadminDashboard({ handleLogout }) {
       }
     } else {
       if (activeTab === 'admins') {
-        axios.put(`http://localhost:8080/superadmin/admin/${dataToSave.id}`, dataToSave)
+        axios.put(`http://localhost:8080/superadmin/admin/${dataToSave.id}`, dataToSave, { headers })
           .then(res => {
             setAdmins(admins.map(admin => admin.id === res.data.id ? res.data : admin));
             setIsModalOpen(false);
           })
           .catch(err => console.error('Error updating admin:', err));
       } else if (activeTab === 'events') {
-        axios.put(`http://localhost:8080/superadmin/event/${dataToSave.id}`, dataToSave)
+        axios.put(`http://localhost:8080/superadmin/event/${dataToSave.id}`, dataToSave, { headers })
           .then(res => {
             setEvents(events.map(event => event.id === res.data.id ? res.data : event));
             setIsModalOpen(false);
@@ -204,17 +212,16 @@ function SuperadminDashboard({ handleLogout }) {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       > 
-      { activeTab != "users"? <div className="flex justify-end mb-4">
+      {activeTab !== "users" && (
+        <div className="flex justify-end mb-4">
           <button
             onClick={handleCreate}
             className="p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
           >
-            Create New {activeTab === 'admins' ? 'Admin' : activeTab === 'users' ? 'User' : 'Event'}
+            Create New {activeTab === 'admins' ? 'Admin' : activeTab === 'events' ? 'Event' : 'Item'}
           </button>
-        </div>:""
-         
-      }
-       
+        </div>
+      )}
         <Table
           headers={currentHeaders}
           data={currentData}

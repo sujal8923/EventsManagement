@@ -6,13 +6,14 @@ import com.EventManagement.Backend.Services.EventService;
 import com.EventManagement.Backend.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/superadmin")
-@CrossOrigin(origins = "http://localhost:5174", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
+// @CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@PreAuthorize("hasRole('SUPER_ADMIN')")
 public class SuperAdminController {
     @Autowired
     private EventService eventService;
@@ -21,27 +22,21 @@ public class SuperAdminController {
 
     @GetMapping("/events")
     public ResponseEntity<?> viewAllEvents() {
-
         return ResponseEntity.ok(eventService.getAllEvent());
     }
 
     @PostMapping("/event")
     public ResponseEntity<?> addEvent(@RequestBody Event e) {
-
-
         return ResponseEntity.ok(eventService.addEvent(e));
     }
 
     @PutMapping("/event/{id}")
     public ResponseEntity<?> updateEvent(@PathVariable Long id, @RequestBody Event e) {
-
-
         return ResponseEntity.ok(eventService.updateEvent(id, e));
     }
 
     @DeleteMapping("/event/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
-
         eventService.deleteEvent(id);
         return ResponseEntity.ok("Deleted");
     }
@@ -53,7 +48,6 @@ public class SuperAdminController {
 
     @GetMapping("/admins")
     public ResponseEntity<?> getAllAdmins() {
-
         List<User> admins = userService.getAll().stream()
                 .filter(u -> "ADMIN".equals(u.getRole()))
                 .toList();
@@ -62,7 +56,6 @@ public class SuperAdminController {
 
     @PutMapping("/admin/{id}")
     public ResponseEntity<?> updateAdmin(@PathVariable Long id, @RequestBody User updated) {
-
         if (!"ADMIN".equals(updated.getRole())) {
             return ResponseEntity.badRequest().body("Only admins can be updated here");
         }
@@ -74,13 +67,12 @@ public class SuperAdminController {
         userService.deleteUser(id);
         return ResponseEntity.ok("Deleted");
     }
-    
-@GetMapping("/users")
-public ResponseEntity<?> getAllUsers() {
-    List<User> allUsers = userService.getAll().stream()
-            .filter(u -> "USER".equalsIgnoreCase(u.getRole()))
-            .toList();
-    return ResponseEntity.ok(allUsers);
-}
 
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers() {
+        List<User> allUsers = userService.getAll().stream()
+                .filter(u -> "USER".equalsIgnoreCase(u.getRole()))
+                .toList();
+        return ResponseEntity.ok(allUsers);
+    }
 }

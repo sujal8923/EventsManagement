@@ -13,7 +13,13 @@ function EventDetailPage({ handleLogout }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/user/event')
+    const token = localStorage.getItem('token'); // Get token from localStorage
+
+    axios.get('http://localhost:8080/user/event', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => {
         setEvents(response.data);
         setLoading(false);
@@ -25,7 +31,7 @@ function EventDetailPage({ handleLogout }) {
   }, []);
 
   const event = events.find(e => e.id === Number(id));
-  const isEventPast = event && new Date(event.date) < new Date(); // ✅ Check if past
+  const isEventPast = event && new Date(event.date) < new Date();
 
   if (loading) {
     return <div className="text-center p-20 text-xl text-gray-600">Loading event...</div>;
@@ -87,7 +93,7 @@ function EventDetailPage({ handleLogout }) {
               )}
               <button
                 onClick={() => navigate('/home')}
-                className={`flex-1 p-3 bg-gray-200 text-gray-800 rounded-full text-lg font-semibold hover:bg-gray-300 transition-all shadow-lg`}
+                className="flex-1 p-3 bg-gray-200 text-gray-800 rounded-full text-lg font-semibold hover:bg-gray-300 transition-all shadow-lg"
               >
                 Back to Events
               </button>

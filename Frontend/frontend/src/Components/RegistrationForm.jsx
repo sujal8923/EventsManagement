@@ -27,24 +27,31 @@ console.log(formData)
   };
   
 
-  const handleSubmit = () => {
-    const payload = {
+ const handleSubmit = () => {
+  const token = localStorage.getItem("token");
+
+  const payload = {
     ...formData,
   };
-    axios
-      .post(`http://localhost:8080/user/register/${id}`,payload, {
-        
-      })
-      .then((response) => {
-        alert('Registration successful!');
-        console.log("userregister", response.data);
-        navigate('/home');
-      })
-      .catch((err) => {
-        console.error('Error during registration:', err);
-        alert('Registration failed. Please try again.');
-      });
-  };
+
+  axios
+    .post(`http://localhost:8080/user/register/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,  // ✅ Send token in header
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      alert('Registration successful!');
+      console.log("userregister", response.data);
+      navigate('/home');
+    })
+    .catch((err) => {
+      console.error('Error during registration:', err);
+      alert('Registration failed. Please try again.');
+    });
+};
+
 
   const inputStyle =
     'w-full pl-10 p-3 rounded-md border border-gray-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:shadow-md placeholder-gray-400 transition-all';
@@ -53,7 +60,7 @@ console.log(formData)
     <div className="flex flex-col min-h-screen w-full bg-gradient-to-tr from-sky-100 to-indigo-100 pt-20">
       <Navbar handleLogout={handleLogout} />
       <div className="flex-grow container mx-auto p-8 bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl my-8 max-w-xl">
-        <h1 className="text-4xl font-bold text-cyan-700 mb-4 text-center">Register for Dummy Event</h1>
+        <h1 className="text-4xl font-bold text-cyan-700 mb-4 text-center">Register for event</h1>
         <p className="text-lg text-gray-700 text-center mb-8">
           Please fill out the form below to register for the event.
         </p>

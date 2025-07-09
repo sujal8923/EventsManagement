@@ -3,10 +3,9 @@ package com.EventManagement.Backend.Services;
 import com.EventManagement.Backend.Entity.Event;
 import com.EventManagement.Backend.Entity.EventRegistration;
 import com.EventManagement.Backend.Entity.User;
-import com.EventManagement.Backend.Repository.EventRegistrationRepository;
 import com.EventManagement.Backend.Repository.EventRepository;
+import com.EventManagement.Backend.Repository.EventRegistrationRepository;
 import com.EventManagement.Backend.Repository.UserRepository;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +19,7 @@ public class RegistrationService {
     private EventRepository eventRepository;
     @Autowired
     private UserRepository userRepository;
+
     public EventRegistration registerUserForEvent(Long eventId, Long userId, Map<String,String> regData){
         Event event = eventRepository.findById(eventId).orElse(null);
         User user = userRepository.findById(userId).orElse(null);
@@ -36,7 +36,4 @@ public class RegistrationService {
 
         return eventRegistrationRepository.save(reg);
     }
-
-
-
 }

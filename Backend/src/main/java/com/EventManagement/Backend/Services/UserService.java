@@ -5,6 +5,7 @@ import com.EventManagement.Backend.Repository.EventRegistrationRepository;
 import com.EventManagement.Backend.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,13 +13,19 @@ import java.util.List;
 @Service
 public class UserService {
     @Autowired
+    private PasswordEncoder passwordEncode;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private EventRegistrationRepository eventRegistrationRepository;
-    public User register(User user){
-        if(!List.of("USER","ADMIN","SUPER_ADMIN").contains(user.getRole())){
+    public User register(User user) {
+        if (!List.of("USER", "ADMIN", "SUPER_ADMIN").contains(user.getRole())) {
             user.setRole("USER");
         }
+
+        // ✅ Encrypt the password using BCrypt before saving
+        user.setPassword(passwordEncode.encode(user.getPassword()));
+
         return userRepository.save(user);
     }
     public User login(String email, String password) {
@@ -29,11 +36,11 @@ public class UserService {
         return null;
     }
     public List<User> getAll(){
-       return userRepository.findAll();
+        return userRepository.findAll();
     }
     public User updateUser(Long id , User updated){
         updated.setId(id);
-       return userRepository.save(updated);
+        return userRepository.save(updated);
     }
     @Transactional
     public void deleteUser(Long id){
@@ -47,5 +54,8 @@ public class UserService {
 
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
+    }
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

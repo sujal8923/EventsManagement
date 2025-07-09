@@ -51,28 +51,33 @@ console.log(loginForm)
       }
       const payload = { email, password };
       const res = axios.post('http://localhost:8080/login', payload);
-      res.then((response)=>{  
-        console.log(response.data)
-        setUserId(response.data.id)
-      
-        console.log(response.data.role)
-        localStorage.setItem('userRole',response.data.role)
-        if(response.data.role == 'USER'){
-          navi('/home')
-        }else if(response.data.role == 'ADMIN'){
-          navi('/admin')  }
-          else{
-            navi('/superadmin')
-          }
-        setLoggedIn(true)
-        setLogin(true)
-        alert('Login successful');
-        console.log('Login Response:', response);
-        setLoginForm({
-          email: '',
-          password: '',
-        })
-      })
+     res.then((response) => {
+      console.log("response from backend",response.data)
+  const { token, role,userId } = response.data;
+
+  // ✅ Save JWT token & role to localStorage
+  localStorage.setItem('token', token);
+  localStorage.setItem('userRole', role);
+  setUserId(userId);
+  setLoggedIn(true);
+  setLogin(true);
+  // 🔁 Navigate based on role
+  if (role === 'USER') {
+    navi('/home');
+  } else if (role === 'ADMIN') {
+    navi('/admin');
+  } else {
+    navi('/superadmin');
+  }
+
+  alert('Login successful');
+
+  // Clear form
+  setLoginForm({
+    email: '',
+    password: '',
+  });
+})
       .catch((error)=>{
         console.error('Login Error:', error);
         setErrorMsg('Login failed. Please check your credentials.');
