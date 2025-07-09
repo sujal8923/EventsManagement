@@ -54,6 +54,7 @@ console.log(loginForm)
       res.then((response)=>{  
         console.log(response.data)
         setUserId(response.data.id)
+      
         console.log(response.data.role)
         localStorage.setItem('userRole',response.data.role)
         if(response.data.role == 'USER'){
