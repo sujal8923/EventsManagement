@@ -35,23 +35,19 @@ public class AdminController {
         }
         return ResponseEntity.ok(userService.updateUser(id, updated));
     }
-
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        try {
-            User user = userService.getUserById(id);
-            if (user == null) {
-                return ResponseEntity.status(404).body("User not found");
-            }
-            if (!"USER".equals(user.getRole())) {
-                return ResponseEntity.badRequest().body("Only USER role accounts can be deleted by admin.");
-            }
-            userService.deleteUser(id);
-            return ResponseEntity.ok("Deleted");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Server error: " + e.getMessage());
+    
+    @PutMapping("/user/toggle/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(404).body("User not found");
         }
+
+        userService.toggleUserStatus(id); // toggling inside service
+
+        // After toggle, fetch again to get updated status
+        User updatedUser = userService.getUserById(id);
+        return ResponseEntity.ok("User is now " + (updatedUser.isActive() ? "active" : "inactive"));
     }
 
     @GetMapping("/events")

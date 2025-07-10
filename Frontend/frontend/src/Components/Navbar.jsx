@@ -110,15 +110,14 @@ function Navbar({ searchTerm, setSearchTerm }) {
 
         {/* Logout button */}
         <div className="flex items-center space-x-4 md:ml-auto">
-          {role && (
-            <button
+          { role != null ?<button
               onClick={logs}
               className="flex items-center space-x-2 p-2 rounded-full bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white font-semibold hover:opacity-90 transition-all shadow-lg"
             >
               <ArrowLeftOnRectangleIcon className="w-5 h-5" />
               <span>Logout</span>
-            </button>
-          )}
+            </button> :""
+          }
         </div>
       </div>
     </nav>

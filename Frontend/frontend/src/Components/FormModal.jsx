@@ -108,6 +108,7 @@ function FormModal({ isOpen, onClose, onSubmit, fields, initialData = {}, title 
           <button
             type="submit"
             className="w-full p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
+
           >
             Submit
           </button>

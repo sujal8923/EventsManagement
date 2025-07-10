@@ -27,27 +27,37 @@ public class AuthController {
 
   @PostMapping("/login")
 public ResponseEntity<?> login(@RequestBody Map<String,String> creds) {
-    // Authenticate
-    Authentication auth = authManager.authenticate(
+    try {
+        // ✅ 1. Find user first
+        User user = userService.findByEmail(creds.get("email"));
+        if (user == null) {
+            return ResponseEntity.status(404).body(Map.of("message", "User not found"));
+        }
+
+        // ✅ 2. Check if user is active
+        if (!user.isActive()) {
+            return ResponseEntity.status(403).body(Map.of("message", "Account is deactivated. Please contact admin."));
+        }
+
+        // ✅ 3. Now authenticate only if user is active
+        Authentication auth = authManager.authenticate(
             new UsernamePasswordAuthenticationToken(creds.get("email"), creds.get("password"))
-    );
+        );
 
-    // Get user entity from DB
-    User user = userService.findByEmail(creds.get("email"));
+        org.springframework.security.core.userdetails.UserDetails userDetails =
+                (org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal();
 
-    // Get authenticated UserDetails object
-    org.springframework.security.core.userdetails.UserDetails userDetails =
-            (org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal();
+        String token = jwtUtil.generateToken(userDetails, user.getRole());
 
-    // Generate JWT with authorities
-    String token = jwtUtil.generateToken(userDetails, user.getRole());
-
-    // Return token + role + userId
-    return ResponseEntity.ok(Map.of(
+        return ResponseEntity.ok(Map.of(
             "token", token,
             "role", user.getRole(),
             "userId", user.getId()
-    ));
+        ));
+
+    } catch (Exception e) {
+        return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
+    }
 }
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {

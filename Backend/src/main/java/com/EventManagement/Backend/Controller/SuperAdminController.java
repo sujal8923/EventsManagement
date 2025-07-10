@@ -62,11 +62,11 @@ public class SuperAdminController {
         return ResponseEntity.ok(userService.updateUser(id, updated));
     }
 
-    @DeleteMapping("/admin/{id}")
-    public ResponseEntity<?> deleteAdmin(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok("Deleted");
-    }
+    // @DeleteMapping("/admin/{id}")
+    // public ResponseEntity<?> deleteAdmin(@PathVariable Long id) {
+    //     userService.deleteUser(id);
+    //     return ResponseEntity.ok("Deleted");
+    // }
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {

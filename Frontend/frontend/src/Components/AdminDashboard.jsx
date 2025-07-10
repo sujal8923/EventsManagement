@@ -1,165 +1,193 @@
-import React, { useEffect, useState } from 'react';
-import Navbar from './Navbar';
-import DashboardLayout from './DashboardLayout';
-import Table from './Table';
-import FormModal from './FormModal';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import Navbar from "./Navbar";
+import DashboardLayout from "./DashboardLayout";
+import Table from "./Table";
+import FormModal from "./FormModal";
+import axios from "axios";
 
 function AdminDashboard({ handleLogout }) {
-  const [activeTab, setActiveTab] = useState('events');
+  const [activeTab, setActiveTab] = useState("events");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState('create');
+  const [modalType, setModalType] = useState("create");
   const [currentFormData, setCurrentFormData] = useState(null);
   const [events, setEvents] = useState([]);
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
-    if (activeTab === 'events') {
-      axios.get('http://localhost:8080/admin/events', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+  useEffect(() => {
+    if (activeTab === "events") {
+      axios
+        .get("http://localhost:8080/admin/events", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then((res) => setEvents(res.data))
-        .catch((err) => console.error('Error fetching events:', err));
-    } else if (activeTab === 'users') {
-      axios.get('http://localhost:8080/admin/users', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => setUsers(res.data))
-        .catch((err) => console.error('Error fetching users:', err));
+        .catch((err) => console.error("Error fetching events:", err));
+    } else if (activeTab === "users") {
+      fetchUsers();
     }
   }, [activeTab]);
 
+  const fetchUsers = () => {
+    axios
+      .get("http://localhost:8080/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setUsers(res.data);
+        // Store each user's active status in localStorage
+        res.data.forEach((user) => {
+          localStorage.setItem(`user_${user.id}_active`, user.active);
+        });
+      })
+      .catch((err) => console.error("Error fetching users:", err));
+  };
+
   const eventHeaders = [
-    { key: 'sno', label: 'S. No.' },
-    { key: 'title', label: 'Event Name' },
-    { key: 'date', label: 'Date' },
-    { key: 'location', label: 'Location' }
+    { key: "sno", label: "S. No." },
+    { key: "title", label: "Event Name" },
+    { key: "date", label: "Date" },
+    { key: "location", label: "Location" },
   ];
 
   const userHeaders = [
-    { key: 'sno', label: 'S. No.' },
-    { key: 'userName', label: 'Username' },
-    { key: 'email', label: 'Email' },
-    { key: 'role', label: 'Role' },
-    { key: 'actions', label: 'Actions' },
+    { key: "sno", label: "S. No." },
+    { key: "userName", label: "Username" },
+    { key: "email", label: "Email" },
+    { key: "role", label: "Roles" },
+    { key: "action", label: "Action" }, // New header for Edit button
+    { key: "statusText", label: "Status" }, // New header for displaying status text
+    { key: "statusButton", label: "Status Toggle" }, // Separate header for the toggle button
   ];
 
   const eventFormFields = [
-    { name: 'name', label: 'Event Name', type: 'text', required: true },
-    { name: 'date', label: 'Date', type: 'date', required: true },
-    { name: 'location', label: 'Location', type: 'text', required: true },
-    { name: 'status', label: 'Status', type: 'text', required: true },
-    { name: 'description', label: 'Description', type: 'textarea', required: false },
-    { name: 'imageUrl', label: 'Image URL', type: 'text', required: false },
-    { name: 'timings', label: 'Timings', type: 'text', required: false },
+    { name: "name", label: "Event Name", type: "text", required: true },
+    { name: "date", label: "Date", type: "date", required: true },
+    { name: "location", label: "Location", type: "text", required: true },
+    { name: "status", label: "Status", type: "text", required: true },
+    { name: "description", label: "Description", type: "textarea", required: false },
+    { name: "imageUrl", label: "Image URL", type: "text", required: false },
+    { name: "timings", label: "Timings", type: "text", required: false },
   ];
 
   const userFormFields = [
-    { name: 'userName', label: 'Username', type: 'text', required: true },
-    { name: 'email', label: 'Email', type: 'email', required: true },
-    { name: 'password', label: 'Password', type: 'password', required: true },
-    { name: 'role', label: 'Role', type: 'text', required: true },
+    { name: "userName", label: "Username", type: "text", required: true },
+    { name: "email", label: "Email", type: "email", required: true },
+    { name: "role", label: "Role", type: "text", required: true },
+    // Password field should not be here for update, only for create if needed
   ];
 
   const handleCreate = () => {
-    setModalType('create');
-    if (activeTab === 'users') {
-      setCurrentFormData({ role: 'User', userName: '', email: '', password: '' });
+    setModalType("create");
+    if (activeTab === "users") {
+      setCurrentFormData({
+        role: "User",
+        userName: "",
+        email: "",
+        password: "", // Include password for creation if allowed
+      });
       setIsModalOpen(true);
     }
   };
 
   const handleUpdate = (data) => {
-    setModalType('update');
+    setModalType("update");
     setCurrentFormData(data);
     setIsModalOpen(true);
   };
 
-  const handleDelete = (idToDelete) => {
-    const token = localStorage.getItem('token');
-    const id = idToDelete.id;
-
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      if (activeTab === 'events') {
-        console.log("Admin cannot delete events (read-only).");
-      } else if (activeTab === 'users') {
-        axios.delete(`http://localhost:8080/admin/user/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-          .then(() => setUsers(users.filter(user => user.id !== id)))
-          .catch((err) => console.error('Error deleting user:', err));
-      }
-    }
+  const handleToggleStatus = (id) => {
+    axios
+      .put(`http://localhost:8080/admin/user/toggle/${id}`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => fetchUsers())
+      .catch((err) => console.error("Error toggling user:", err));
   };
 
   const handleFormSubmit = (formData) => {
-    const token = localStorage.getItem('token');
-
-    if (modalType === 'create') {
-      const newId = `${activeTab.slice(0, -1)}${Date.now()}`;
-      let newItem = { id: newId, ...formData };
-
-      if (activeTab === 'events') {
-        console.log("Admin cannot create events.");
-      } else if (activeTab === 'users') {
-        newItem = { ...newItem, role: 'User' };
-        setUsers([...users, newItem]); // Frontend-only for now
-      }
+    if (modalType === "create") {
+      console.log("Admin cannot create users from frontend directly."); // As per your original comment
+      // If you decide to allow creation:
+      // axios.post("http://localhost:8080/admin/user", formData, { headers: { Authorization: `Bearer ${token}` }})
+      //   .then(() => { fetchUsers(); setIsModalOpen(false); })
+      //   .catch(err => { console.error("Creation failed:", err); alert("Failed to create user."); });
     } else {
-      if (activeTab === 'events') {
-        console.log("Admin cannot update events.");
-      } else if (activeTab === 'users') {
-        axios.put(`http://localhost:8080/admin/user/${formData.id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+      if (activeTab === "users") {
+        axios
+          .put(`http://localhost:8080/admin/user/${formData.id}`, formData, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
           .then((res) => {
-            setUsers(users.map(user => user.id === formData.id ? res.data : user));
+            setUsers(users.map((user) => (user.id === formData.id ? res.data : user)));
             setIsModalOpen(false);
           })
           .catch((err) => {
-            console.error('Update failed:', err);
-            alert('Failed to update user.');
+            console.error("Update failed:", err);
+            alert("Failed to update user.");
           });
-        return;
+      } else if (activeTab === "events") {
+        // Implement event update logic here if you enable it later
+        // axios.put(`http://localhost:8080/admin/event/${formData.id}`, formData, { headers: { Authorization: `Bearer ${token}` }})
+        //   .then(() => { setEvents(events.map(event => event.id === formData.id ? res.data : event)); setIsModalOpen(false); })
+        //   .catch(err => { console.error("Event update failed:", err); alert("Failed to update event."); });
       }
     }
+    setIsModalOpen(false); // Close modal after submission attempt
+  };
 
-    setIsModalOpen(false);
+  const formatUsersWithButtons = (users) => {
+    return users.map((user, index) => ({
+      ...user,
+      sno: index + 1,
+      // Action column with Edit button
+      action: (
+        <button
+          className="px-3 py-1 rounded text-white bg-blue-600 hover:bg-blue-700"
+          onClick={() => handleUpdate(user)}
+        >
+          Edit
+        </button>
+      ),
+      // Status text from local storage or actual user active status
+      statusText: localStorage.getItem(`user_${user.id}_active`) === 'true' ? "Active" : "Inactive",
+      // Status toggle button
+      statusButton: (
+        <button
+          className={`px-3 py-1 rounded text-white ${
+            user.active ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
+          }`}
+          onClick={() => handleToggleStatus(user.id)}
+        >
+          {user.active ? "Deactivate" : "Activate"}
+        </button>
+      ),
+    }));
   };
 
   let currentData = [];
   let currentHeaders = [];
   let currentFormFields = [];
   let modalTitle = "";
-  let showCreateButton = false;
+  let showCreateButton = false; // Admin cannot create users directly from frontend as per console.log
 
-  if (activeTab === 'events') {
+  if (activeTab === "events") {
     currentData = events;
     currentHeaders = eventHeaders;
     currentFormFields = eventFormFields;
-    modalTitle = modalType === 'create' ? 'Create New Event' : 'Update Event';
-    showCreateButton = false;
-  } else if (activeTab === 'users') {
-    currentData = users;
+    modalTitle = modalType === "create" ? "Create New Event" : "Update Event";
+    showCreateButton = false; // Events are not created from this dashboard
+  } else if (activeTab === "users") {
+    currentData = formatUsersWithButtons(users);
     currentHeaders = userHeaders;
     currentFormFields = userFormFields;
-    modalTitle = modalType === 'create' ? 'Create New User' : 'Update User';
-    showCreateButton = true;
+    modalTitle = modalType === "create" ? "Create New User" : "Update User";
+    showCreateButton = false; // Admin cannot create users directly from frontend
   }
 
   const tabs = [
-    { id: 'events', label: 'Events' },
-    { id: 'users', label: 'Users' },
+    { id: "events", label: "Events" },
+    { id: "users", label: "Users" },
   ];
 
   return (
@@ -174,9 +202,8 @@ function AdminDashboard({ handleLogout }) {
         <Table
           headers={currentHeaders}
           data={currentData}
-          onUpdate={activeTab === 'users' ? handleUpdate : null}
-          onDelete={activeTab === 'users' ? handleDelete : null}
-          showActions={activeTab === 'users'}
+          onUpdate={activeTab === "users" ? handleUpdate : null} // Pass handleUpdate for users
+          showActions={activeTab === "users"} // Show actions column only for users
           showCreateButton={showCreateButton}
           onCreate={handleCreate}
         />

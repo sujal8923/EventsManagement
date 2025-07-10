@@ -34,6 +34,26 @@ function SuperadminDashboard({ handleLogout }) {
     }
   }, [activeTab]);
 
+  const handleActivateToggle = (item) => {
+    const headers = { Authorization: `Bearer ${token}` };
+    const url = `http://localhost:8080/admin/user/toggle/${item.id}`;
+
+    axios.put(url, {}, { headers })
+      .then(() => {
+        alert(`${item.userName || item.email} has been ${item.active ? 'deactivated' : 'activated'}`);
+
+        if (activeTab === 'admins') {
+          axios.get('http://localhost:8080/superadmin/admins', { headers }).then(res => setAdmins(res.data));
+        } else if (activeTab === 'users') {
+          axios.get('http://localhost:8080/admin/users', { headers }).then(res => setUsers(res.data));
+        }
+      })
+      .catch(err => {
+        console.error('Toggle error:', err);
+        alert('Failed to update user status.');
+      });
+  };
+
   const adminHeaders = [
     { key: 'sno', label: 'S. No.' },
     { key: 'userName', label: 'Username' },
@@ -42,13 +62,7 @@ function SuperadminDashboard({ handleLogout }) {
     { key: 'actions', label: 'Actions' },
   ];
 
-  const userHeaders = [
-    { key: 'sno', label: 'S. No.' },
-    { key: 'userName', label: 'Username' },
-    { key: 'email', label: 'Email' },
-    { key: 'role', label: 'Role' },
-    { key: 'actions', label: 'Actions' },
-  ];
+  const userHeaders = [...adminHeaders];
 
   const eventHeaders = [
     { key: 'sno', label: 'S. No.' },
@@ -88,8 +102,6 @@ function SuperadminDashboard({ handleLogout }) {
       setCurrentFormData({ role: 'USER', userName: '', email: '' });
     } else if (activeTab === 'events') {
       setCurrentFormData({ title: '', date: '', location: '', description: '', imageUrl: '' });
-    } else {
-      setCurrentFormData(null);
     }
     setIsModalOpen(true);
   };
@@ -104,19 +116,7 @@ function SuperadminDashboard({ handleLogout }) {
     const headers = { Authorization: `Bearer ${token}` };
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
-    if (activeTab === 'admins') {
-      axios.delete(`http://localhost:8080/superadmin/admin/${item.id}`, { headers })
-        .then(() => {
-          axios.get('http://localhost:8080/superadmin/admins', { headers })
-            .then(res => setAdmins(res.data));
-        });
-    } else if (activeTab === 'users') {
-      axios.delete(`http://localhost:8080/admin/user/${item.id}`, { headers })
-        .then(() => {
-          axios.get('http://localhost:8080/admin/users', { headers })
-            .then(res => setUsers(res.data));
-        });
-    } else if (activeTab === 'events') {
+    if (activeTab === 'events') {
       axios.delete(`http://localhost:8080/superadmin/event/${item.id}`, { headers })
         .then(() => {
           axios.get('http://localhost:8080/superadmin/events', { headers })
@@ -185,7 +185,7 @@ function SuperadminDashboard({ handleLogout }) {
   } else if (activeTab === 'users') {
     currentData = users;
     currentHeaders = userHeaders;
-    currentFormFields = modalType === 'create' ? userFormFields : userFormFields; // You can filter out some fields if needed
+    currentFormFields = userFormFields;
     modalTitle = modalType === 'create' ? 'Create New User' : 'Update User';
   } else if (activeTab === 'events') {
     currentData = events;
@@ -219,11 +219,13 @@ function SuperadminDashboard({ handleLogout }) {
             </button>
           </div>
         )}
+
         <Table
           headers={currentHeaders}
           data={currentData}
           onUpdate={handleUpdate}
-          onDelete={handleDelete}
+          onDelete={activeTab === 'events' ? handleDelete : null}
+          customAction={activeTab !== 'events' ? handleActivateToggle : null}
           showActions={true}
         />
       </DashboardLayout>

@@ -22,6 +22,7 @@ public class UserService {
         if (!List.of("USER", "ADMIN", "SUPER_ADMIN").contains(user.getRole())) {
             user.setRole("USER");
         }
+        user.setActive(true);
 
         // ✅ Encrypt the password using BCrypt before saving
         user.setPassword(passwordEncode.encode(user.getPassword()));
@@ -30,8 +31,10 @@ public class UserService {
     }
     public User login(String email, String password) {
         User user = userRepository.findByEmail(email);
-        if (user != null && user.getPassword().equals(password)) {
-            return user;
+        if(user.isActive()){
+            if (user != null && user.getPassword().equals(password)) {
+                return user;
+            }
         }
         return null;
     }
@@ -42,14 +45,15 @@ public class UserService {
         updated.setId(id);
         return userRepository.save(updated);
     }
-    @Transactional
-    public void deleteUser(Long id){
-
-        eventRegistrationRepository.deleteByUserId(id);
-
-
-        userRepository.deleteById(id);
+        public void toggleUserStatus(Long id) {
+        User user = getUserById(id);
+        if (user != null) {
+            user.setActive(!user.isActive());
+            userRepository.save(user);  // ✅ important to persist the change
+        }
     }
+
+    
 
 
     public User getUserById(Long id) {
