@@ -24,17 +24,30 @@ public class AuthController {
     @Autowired private JwtUtil jwtUtil;
     @Autowired private UserService userService;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String,String> creds) {
-        Authentication auth = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(creds.get("email"), creds.get("password")));
+  @PostMapping("/login")
+public ResponseEntity<?> login(@RequestBody Map<String,String> creds) {
+    // Authenticate
+    Authentication auth = authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(creds.get("email"), creds.get("password"))
+    );
 
-        User user = userService.findByEmail(creds.get("email"));
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+    // Get user entity from DB
+    User user = userService.findByEmail(creds.get("email"));
 
-        return ResponseEntity.ok(Map.of("token", token, "role", user.getRole(),"userId",user.getId()));
-    }
+    // Get authenticated UserDetails object
+    org.springframework.security.core.userdetails.UserDetails userDetails =
+            (org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal();
 
+    // Generate JWT with authorities
+    String token = jwtUtil.generateToken(userDetails, user.getRole());
+
+    // Return token + role + userId
+    return ResponseEntity.ok(Map.of(
+            "token", token,
+            "role", user.getRole(),
+            "userId", user.getId()
+    ));
+}
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         user.setRole(user.getRole() == null || user.getRole().isBlank() ? "USER" : user.getRole());

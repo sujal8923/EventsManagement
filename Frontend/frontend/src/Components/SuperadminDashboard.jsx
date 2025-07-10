@@ -140,6 +140,7 @@ function SuperadminDashboard({ handleLogout }) {
       if (activeTab === 'admins') {
         axios.post('http://localhost:8080/superadmin/admin', dataToSave, { headers })
           .then(() => {
+            alert("Admin created successfully!");
             axios.get('http://localhost:8080/superadmin/admins', { headers })
               .then(res => setAdmins(res.data))
               .catch(err => console.error('Error refreshing admins:', err));
@@ -148,7 +149,8 @@ function SuperadminDashboard({ handleLogout }) {
           .catch(err => console.error('Error creating admin:', err));
       } else if (activeTab === 'events') {
         axios.post('http://localhost:8080/superadmin/event', dataToSave, { headers })
-          .then(() => {
+        .then(() => {
+            alert("Event created successfully!");
             axios.get('http://localhost:8080/superadmin/events', { headers })
               .then(res => setEvents(res.data))
               .catch(err => console.error('Error refreshing events:', err));
@@ -160,13 +162,16 @@ function SuperadminDashboard({ handleLogout }) {
       if (activeTab === 'admins') {
         axios.put(`http://localhost:8080/superadmin/admin/${dataToSave.id}`, dataToSave, { headers })
           .then(res => {
+            alert("Admin updated successfully!");
             setAdmins(admins.map(admin => admin.id === res.data.id ? res.data : admin));
             setIsModalOpen(false);
           })
           .catch(err => console.error('Error updating admin:', err));
       } else if (activeTab === 'events') {
+
         axios.put(`http://localhost:8080/superadmin/event/${dataToSave.id}`, dataToSave, { headers })
           .then(res => {
+            alert("Event updated successfully!");
             setEvents(events.map(event => event.id === res.data.id ? res.data : event));
             setIsModalOpen(false);
           })

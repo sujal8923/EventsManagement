@@ -24,15 +24,19 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username, String role) {
-        return Jwts.builder()
-                .setSubject(username)
-                .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600_000)) // 1 hour
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
+  public String generateToken(org.springframework.security.core.userdetails.UserDetails userDetails, String role) {
+    return Jwts.builder()
+            .setSubject(userDetails.getUsername())
+            .claim("role", role)
+            .claim("authorities", userDetails.getAuthorities().stream()
+                    .map(auth -> auth.getAuthority())
+                    .toList())
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 3600_000)) // 1 hour
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
+}
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
