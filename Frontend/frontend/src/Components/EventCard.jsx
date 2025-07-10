@@ -3,6 +3,7 @@ import { CalendarDaysIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
 function EventCard({ event, navigate }) {
+  let role = localStorage.getItem('userRole');
   return (
     <div
       onClick={() => navigate(`/event/${event.id}`)}
@@ -39,7 +40,11 @@ function EventCard({ event, navigate }) {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/register/${event.id}`);
+            if( role != 'USER'){
+              alert('Please login as a user to register for events.');
+            }else{
+              navigate(`/register/${event.id}`);
+            }
           }}
           className="mt-2 px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-full font-semibold transition-shadow shadow-md hover:shadow-lg w-full"
         >

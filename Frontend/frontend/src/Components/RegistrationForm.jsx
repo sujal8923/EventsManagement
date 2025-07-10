@@ -44,7 +44,7 @@ console.log(formData)
     .then((response) => {
       alert('Registration successful!');
       console.log("userregister", response.data);
-      navigate('/home');
+      navigate('/');
     })
     .catch((err) => {
       console.error('Error during registration:', err);

@@ -11,7 +11,7 @@ import ContactUs from "./Components/ContactUs";
 import EventDetailPage from "./Components/EventDetailPage";
 import RegistrationForm from "./Components/RegistrationForm";
 import Navbar from "./Components/Navbar";
-import ProtectedRoutes from "./Components/ProtectedRoutes";
+// import ProtectedRoutes from "./Components/ProtectedRoutes";
 import UserHomePage from "./Components/UserHomePage";
 
 function AppContent() {
@@ -24,19 +24,19 @@ function AppContent() {
   console.log(localStorage.getItem("userRole"));
   return (
     <div className="min-h-screen bg-gradient-to-tr from-sky-100 to-indigo-100 px-4 font-inter">
-      {loggedIn && storedLogin === true ? (
+      {/* {loggedIn && storedLogin === true ? ( */}
         <Navbar
           setLogin={setLogin}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
-      ) : (
+      {/* ) : ( */}
         ""
-      )}
+      {/* )} */}
 
       <Routes>
         <Route
-          path="/"
+          path="/login"
           element={
             <Login
               setUserId={setUserId}
@@ -46,12 +46,12 @@ function AppContent() {
           }
         />
         <Route
-          path="/home"
+          path="/"
           element={
             // <UserHomePage/>
-            <ProtectedRoutes allowedRoles={["USER"]}>
+            // <ProtectedRoutes allowedRoles={["USER"]}>
               <UserHomePage searchTerm={searchTerm} />
-            </ProtectedRoutes>
+            // </ProtectedRoutes>
           }
         />
         <Route path="/about" element={<AboutUs />} />
@@ -64,17 +64,17 @@ function AppContent() {
         <Route
           path="/superadmin"
           element={
-            <ProtectedRoutes allowedRoles={["SUPER_ADMIN"]}>
+            // <ProtectedRoutes allowedRoles={["SUPER_ADMIN"]}>
               <SuperadminDashboard />
-            </ProtectedRoutes>
+            // </ProtectedRoutes>
           }
         />
         <Route
           path="/admin"
           element={
-            <ProtectedRoutes allowedRoles={["ADMIN"]}>
+            // <ProtectedRoutes allowedRoles={["ADMIN"]}>
               <AdminDashboard />
-            </ProtectedRoutes>
+            // </ProtectedRoutes>
           }
         />
         {/* 404 fallback */}
@@ -84,7 +84,7 @@ function AppContent() {
             <div className="grid min-h-screen place-items-center text-center text-gray-700">
               <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
               <a
-                href="/"
+                href="/login"
                 className="p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
               >
                 Go to Login

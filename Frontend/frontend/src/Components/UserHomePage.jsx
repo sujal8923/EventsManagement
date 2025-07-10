@@ -17,7 +17,7 @@ function UserHomePage({ handleLogout }) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,  // ✅ JWT token passed here
+          
       },
     })
       .then((res) => {

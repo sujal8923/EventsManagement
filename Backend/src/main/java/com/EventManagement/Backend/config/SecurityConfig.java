@@ -36,11 +36,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 👈 Custom CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/user/event").permitAll() 
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .requestMatchers("/superadmin/**").hasRole("SUPER_ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated()

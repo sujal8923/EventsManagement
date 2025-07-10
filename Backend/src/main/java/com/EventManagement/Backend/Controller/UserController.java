@@ -12,7 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 // @CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-@PreAuthorize("hasRole('USER')")
+
 public class UserController {
     @Autowired
     private EventService eventService;
@@ -23,7 +23,7 @@ public class UserController {
     public ResponseEntity<?> getEvent(){
         return ResponseEntity.ok(eventService.getAllEvent());
     }
-
+@PreAuthorize("hasRole('USER')")
     @PostMapping("/register/{eventId}")
     public ResponseEntity<?> registerEvent(
             @PathVariable Long eventId,

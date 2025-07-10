@@ -24,7 +24,7 @@ function SuperadminDashboard({ handleLogout }) {
         .then(res => setAdmins(res.data))
         .catch(err => console.error('Error fetching admins:', err));
     } else if (activeTab === 'users') {
-      axios.get('http://localhost:8080/superadmin/users', { headers })
+      axios.get('http://localhost:8080/admin/users', { headers })
         .then(res => setUsers(res.data))
         .catch(err => console.error('Error fetching users:', err));
     } else if (activeTab === 'events') {
@@ -46,7 +46,8 @@ function SuperadminDashboard({ handleLogout }) {
     { key: 'sno', label: 'S. No.' },
     { key: 'userName', label: 'Username' },
     { key: 'email', label: 'Email' },
-    { key: 'role', label: 'Role' }
+    { key: 'role', label: 'Role' },
+    { key: 'actions', label: 'Actions' },
   ];
 
   const eventHeaders = [
@@ -62,14 +63,13 @@ function SuperadminDashboard({ handleLogout }) {
     { name: 'email', label: 'Email', type: 'email', required: true },
     { name: 'password', label: 'Password', type: 'password', required: true },
     { name: 'confirmPassword', label: 'Confirm Password', type: 'password', required: true },
-    { name: 'role', label: 'Role', type: 'text', required: true, defaultValue: 'Admin' },
+    { name: 'role', label: 'Role', type: 'text', required: true, defaultValue: 'ADMIN' },
   ];
 
   const userFormFields = [
     { name: 'userName', label: 'Username', type: 'text', required: true },
     { name: 'email', label: 'Email', type: 'email', required: true },
-    { name: 'password', label: 'Password', type: 'password', required: true },
-    { name: 'role', label: 'Role', type: 'text', required: true, defaultValue: 'User' },
+    { name: 'role', label: 'Role', type: 'text', required: true, defaultValue: 'USER' }
   ];
 
   const eventFormFields = [
@@ -85,7 +85,7 @@ function SuperadminDashboard({ handleLogout }) {
     if (activeTab === 'admins') {
       setCurrentFormData({ role: 'ADMIN', userName: '', email: '', password: '', confirmPassword: '' });
     } else if (activeTab === 'users') {
-      setCurrentFormData({ role: 'User', userName: '', email: '', password: '' });
+      setCurrentFormData({ role: 'USER', userName: '', email: '' });
     } else if (activeTab === 'events') {
       setCurrentFormData({ title: '', date: '', location: '', description: '', imageUrl: '' });
     } else {
@@ -100,63 +100,51 @@ function SuperadminDashboard({ handleLogout }) {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (idToDelete) => {
+  const handleDelete = (item) => {
     const headers = { Authorization: `Bearer ${token}` };
+    if (!window.confirm('Are you sure you want to delete this item?')) return;
 
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      if (activeTab === 'admins') {
-        axios.delete(`http://localhost:8080/superadmin/admin/${idToDelete.id}`, { headers })
-          .then(() => {
-            axios.get('http://localhost:8080/superadmin/admins', { headers })
-              .then(res => setAdmins(res.data))
-              .catch(err => console.error('Error refreshing admins:', err));
-          })
-          .catch(err => console.error('Error deleting admin:', err));
-      } else if (activeTab === 'users') {
-        setUsers(users.filter(user => user.id !== idToDelete.id));
-      } else if (activeTab === 'events') {
-        axios.delete(`http://localhost:8080/superadmin/event/${idToDelete.id}`, { headers })
-          .then(() => {
-            axios.get('http://localhost:8080/superadmin/events', { headers })
-              .then(res => setEvents(res.data))
-              .catch(err => console.error('Error refreshing events:', err));
-          })
-          .catch(err => console.error('Error deleting event:', err));
-      }
+    if (activeTab === 'admins') {
+      axios.delete(`http://localhost:8080/superadmin/admin/${item.id}`, { headers })
+        .then(() => {
+          axios.get('http://localhost:8080/superadmin/admins', { headers })
+            .then(res => setAdmins(res.data));
+        });
+    } else if (activeTab === 'users') {
+      axios.delete(`http://localhost:8080/admin/user/${item.id}`, { headers })
+        .then(() => {
+          axios.get('http://localhost:8080/admin/users', { headers })
+            .then(res => setUsers(res.data));
+        });
+    } else if (activeTab === 'events') {
+      axios.delete(`http://localhost:8080/superadmin/event/${item.id}`, { headers })
+        .then(() => {
+          axios.get('http://localhost:8080/superadmin/events', { headers })
+            .then(res => setEvents(res.data));
+        });
     }
   };
 
   const handleFormSubmit = (formData) => {
     const headers = { Authorization: `Bearer ${token}` };
-
-    if (activeTab === 'admins' && formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
-      return;
-    }
-
     const { confirmPassword, ...dataToSave } = formData;
 
     if (modalType === 'create') {
       if (activeTab === 'admins') {
+        if (formData.password !== formData.confirmPassword) return alert('Passwords do not match!');
         axios.post('http://localhost:8080/superadmin/admin', dataToSave, { headers })
           .then(() => {
             alert("Admin created successfully!");
-            axios.get('http://localhost:8080/superadmin/admins', { headers })
-              .then(res => setAdmins(res.data))
-              .catch(err => console.error('Error refreshing admins:', err));
+            axios.get('http://localhost:8080/superadmin/admins', { headers }).then(res => setAdmins(res.data));
             setIsModalOpen(false);
-          })
-          .catch(err => console.error('Error creating admin:', err));
+          });
       } else if (activeTab === 'events') {
         axios.post('http://localhost:8080/superadmin/event', dataToSave, { headers })
-        .then(() => {
+          .then(() => {
             alert("Event created successfully!");
-            axios.get('http://localhost:8080/superadmin/events', { headers })
-              .then(res => setEvents(res.data))
-              .catch(err => console.error('Error refreshing events:', err));
+            axios.get('http://localhost:8080/superadmin/events', { headers }).then(res => setEvents(res.data));
             setIsModalOpen(false);
-          })
-          .catch(err => console.error('Error creating event:', err));
+          });
       }
     } else {
       if (activeTab === 'admins') {
@@ -165,17 +153,21 @@ function SuperadminDashboard({ handleLogout }) {
             alert("Admin updated successfully!");
             setAdmins(admins.map(admin => admin.id === res.data.id ? res.data : admin));
             setIsModalOpen(false);
-          })
-          .catch(err => console.error('Error updating admin:', err));
+          });
       } else if (activeTab === 'events') {
-
         axios.put(`http://localhost:8080/superadmin/event/${dataToSave.id}`, dataToSave, { headers })
           .then(res => {
             alert("Event updated successfully!");
             setEvents(events.map(event => event.id === res.data.id ? res.data : event));
             setIsModalOpen(false);
-          })
-          .catch(err => console.error('Error updating event:', err));
+          });
+      } else if (activeTab === 'users') {
+        axios.put(`http://localhost:8080/admin/user/${dataToSave.id}`, dataToSave, { headers })
+          .then(res => {
+            alert("User updated successfully!");
+            setUsers(users.map(user => user.id === res.data.id ? res.data : user));
+            setIsModalOpen(false);
+          });
       }
     }
   };
@@ -193,7 +185,7 @@ function SuperadminDashboard({ handleLogout }) {
   } else if (activeTab === 'users') {
     currentData = users;
     currentHeaders = userHeaders;
-    currentFormFields = userFormFields;
+    currentFormFields = modalType === 'create' ? userFormFields : userFormFields; // You can filter out some fields if needed
     modalTitle = modalType === 'create' ? 'Create New User' : 'Update User';
   } else if (activeTab === 'events') {
     currentData = events;
@@ -216,23 +208,23 @@ function SuperadminDashboard({ handleLogout }) {
         tabs={tabs}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-      > 
-      {activeTab !== "users" && (
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={handleCreate}
-            className="p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
-          >
-            Create New {activeTab === 'admins' ? 'Admin' : activeTab === 'events' ? 'Event' : 'Item'}
-          </button>
-        </div>
-      )}
+      >
+        {activeTab !== "users" && (
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={handleCreate}
+              className="p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
+            >
+              Create New {activeTab === 'admins' ? 'Admin' : activeTab === 'events' ? 'Event' : 'Item'}
+            </button>
+          </div>
+        )}
         <Table
           headers={currentHeaders}
           data={currentData}
-          onUpdate={activeTab === 'users' ? undefined : handleUpdate}
-          onDelete={activeTab === 'users' ? undefined : handleDelete}
-          showActions={activeTab !== 'users'}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          showActions={true}
         />
       </DashboardLayout>
 

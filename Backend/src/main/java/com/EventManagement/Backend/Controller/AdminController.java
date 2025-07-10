@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 @CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
 public class AdminController {
     @Autowired
     private UserService userService;

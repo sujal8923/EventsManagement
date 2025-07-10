@@ -1,99 +1,124 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { HomeIcon, InformationCircleIcon, PhoneIcon, MagnifyingGlassIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
-import axios from 'axios';
+import { useNavigate, useLocation } from 'react-router-dom';
+import {
+  HomeIcon,
+  InformationCircleIcon,
+  PhoneIcon,
+  ArrowLeftOnRectangleIcon,
+} from '@heroicons/react/24/outline';
 
-function Navbar({   searchTerm, setSearchTerm }) { 
-  
+function Navbar({ searchTerm, setSearchTerm }) {
   const navigate = useNavigate();
-  const navItemClass = "flex items-center space-x-2 p-2 rounded-lg hover:bg-cyan-100 transition-colors cursor-pointer text-gray-700 hover:text-cyan-700";
-  const iconClass = "w-5 h-5";
-
+  const location = useLocation();
 
   const logs = () => {
-  localStorage.removeItem('token');       // Remove JWT token
-  localStorage.removeItem('userRole');    // Remove stored role
-  localStorage.setItem('loggedIn', 'false');
-  alert('Logout successful');
-  navigate('/');  
-                        
-};
-  let role = localStorage.getItem('userRole');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    localStorage.setItem('loggedIn', 'false');
+    alert('Logout successful');
+    navigate('/login');
+  };
+
+  const role = localStorage.getItem('userRole');
+
+  // Helper to apply active class
+ const getNavItemClass = (path) =>
+  `flex items-center space-x-2 p-2 rounded-lg transition-colors cursor-pointer ${
+    location.pathname === path
+      ? 'text-red-600 font-semibold'
+      : 'text-gray-700 hover:text-red-600'
+  }`;
+
 
   return (
     <nav className="w-full bg-white/80 backdrop-blur-md shadow-md py-4 px-6 flex flex-col md:flex-row justify-between items-center rounded-b-3xl fixed top-0 left-0 right-0 z-50">
-      
       <div className="text-2xl font-bold text-cyan-700 mb-4 md:mb-0 md:mr-8">
         EventFlow
       </div>
-      
-      <div className="flex flex-col md:flex-row items-center flex-grow justify-center">
 
-        
+      <div className="flex flex-col md:flex-row items-center flex-grow justify-center">
         <div className="flex flex-wrap justify-center md:flex-row md:space-x-6 space-y-2 md:space-y-0 mb-4 md:mb-0">
+          {/* Login (when not logged in) */}
+          {!role && (
+            <button
+              className={getNavItemClass('/login')}
+              onClick={() => navigate('/login')}
+            >
+              {/* <HomeIcon className="w-5 h-5" /> */}
+              <span>Login</span>
+            </button>
+          )}
+
+          {/* Home for USER */}
+          {/* {role === 'USER' && ( */}
           {
-            role != null && role === 'USER'? <button className={navItemClass} onClick={() => { navigate('/home');  }}>
-            <HomeIcon className={iconClass} />
-            <span>Home</span>
-          </button>:""
+             role == 'USER' || role == null ? <button
+              className={getNavItemClass('/')}
+              onClick={() => navigate('/')}
+            >
+              <HomeIcon className="w-5 h-5" />
+              <span>Home</span>
+            </button>:""
           }
-          <button className={navItemClass} onClick={() => { navigate('/about');  }}>
-            <InformationCircleIcon className={iconClass} />
+            
+           {role === 'SUPER_ADMIN' && (
+            <button
+              className={getNavItemClass('/superadmin')}
+              onClick={() => navigate('/superadmin')}
+            >
+              <HomeIcon className="w-5 h-5" />
+              <span>Home</span>
+            </button>
+          )}
+          {role === 'ADMIN' && (
+            <button
+              className={getNavItemClass('/admin')}
+              onClick={() => navigate('/admin')}
+            >
+              <HomeIcon className="w-5 h-5" />
+              <span>Home</span>
+            </button>
+          )}
+
+          {/* About Us */}
+          <button
+            className={getNavItemClass('/about')}
+            onClick={() => navigate('/about')}
+          >
+            <InformationCircleIcon className="w-5 h-5" />
             <span>About Us</span>
           </button>
-          <button className={navItemClass} onClick={() => { navigate('/contact');  }}>
-            <PhoneIcon className={iconClass} />
-            <span>Contact Us</span>
-          </button>
-          
+
+          {/* Contact Us */}
           {
-            role != null && role === 'SUPER_ADMIN'? <button className={navItemClass} onClick={() => { navigate('/superadmin');  }}>
-              <span>Superadmin Dashboard</span>
-            </button>:""
+            role == 'USER' ?  <button
+            className={getNavItemClass('/contact')}
+            onClick={() => navigate('/contact')}
+          >
+            <PhoneIcon className="w-5 h-5" />
+            <span>Contact Us</span>
+          </button>:""
           }
-            
-         {
-           role != null &&   role == 'ADMIN' ? <button className={navItemClass} onClick={() => { navigate('/admin');  }}>
-              <span>Admin Dashboard</span>
-            </button>:""
-         }
-            
+         
+
+          {/* Home for SUPER_ADMIN */}
+         
+
+          {/* Home for ADMIN */}
           
         </div>
 
-    
-          <div className="md:w-40 lg:w-60 xl:w-80">
-          </div>
-        
-
-      
+        {/* Logout button */}
         <div className="flex items-center space-x-4 md:ml-auto">
-          
-            {/* <div className="relative">
-              <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search events..."
-                className="pl-10 p-2 rounded-full border border-gray-300 outline-none focus:ring-2 focus:ring-cyan-400 focus:shadow-md transition-all w-40 md:w-auto"
-                value={searchTerm}
-                onChange={(e) => {
-                
-                  if (typeof setSearchTerm === 'function') {
-                    setSearchTerm(e.target.value);
-                    console.log('Search Term Updated:', e.target.value); 
-                  } else {
-                    console.error('setSearchTerm is not a function in Navbar.jsx');
-                  }
-                }}
-              />
-            </div> */}
-          {/* )} */}
-          <button
-            onClick={logs}
-            className="flex items-center space-x-2 p-2 rounded-full bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white font-semibold hover:opacity-90 transition-all shadow-lg"
-          >
-            <span >Logout</span>
-          </button>
+          {role && (
+            <button
+              onClick={logs}
+              className="flex items-center space-x-2 p-2 rounded-full bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white font-semibold hover:opacity-90 transition-all shadow-lg"
+            >
+              <ArrowLeftOnRectangleIcon className="w-5 h-5" />
+              <span>Logout</span>
+            </button>
+          )}
         </div>
       </div>
     </nav>

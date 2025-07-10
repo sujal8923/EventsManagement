@@ -63,7 +63,7 @@ console.log(loginForm)
   setLogin(true);
   // 🔁 Navigate based on role
   if (role === 'USER') {
-    navi('/home');
+    navi('/');
   } else if (role === 'ADMIN') {
     navi('/admin');
   } else {

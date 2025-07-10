@@ -92,7 +92,7 @@ function EventDetailPage({ handleLogout }) {
                 </button>
               )}
               <button
-                onClick={() => navigate('/home')}
+                onClick={() => navigate('/')}
                 className="flex-1 p-3 bg-gray-200 text-gray-800 rounded-full text-lg font-semibold hover:bg-gray-300 transition-all shadow-lg"
               >
                 Back to Events
