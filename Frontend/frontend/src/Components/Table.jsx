@@ -58,9 +58,9 @@ function Table({ headers, data, onUpdate, onDelete, customAction, showActions = 
                         <button
                           onClick={() => customAction(row)}
                           className={`text-white px-3 py-1 rounded-full text-xs font-semibold 
-                            ${row.active ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700'}`}
+                            ${row.active ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-700'}`}
                         >
-                          {row.active ? 'Deactivate' : 'Activate'}
+                          {row.active ? 'Deactivates' : 'Activates'}
                         </button>
                       )}
                     </div>

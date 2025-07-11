@@ -15,15 +15,18 @@ function Navbar({ searchTerm, setSearchTerm }) {
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
     localStorage.setItem('loggedIn', 'false');
-    alert('Logout successful');
-    navigate('/login');
+    window.confirm('Are you sure you want to logout?') && window.location.reload();
+    window.location.href = '/login';
+    // navigate('/login');
+    
+// };
   };
 
   const role = localStorage.getItem('userRole');
 
   // Helper to apply active class
  const getNavItemClass = (path) =>
-  `flex items-center space-x-2 p-2 rounded-lg transition-colors cursor-pointer ${
+  `flex items-center space-x-2 p-2 rounded-lg transition-colors cursor-pointer  ${
     location.pathname === path
       ? 'text-red-600 font-semibold'
       : 'text-gray-700 hover:text-red-600'
@@ -39,15 +42,7 @@ function Navbar({ searchTerm, setSearchTerm }) {
       <div className="flex flex-col md:flex-row items-center flex-grow justify-center">
         <div className="flex flex-wrap justify-center md:flex-row md:space-x-6 space-y-2 md:space-y-0 mb-4 md:mb-0">
           {/* Login (when not logged in) */}
-          {!role && (
-            <button
-              className={getNavItemClass('/login')}
-              onClick={() => navigate('/login')}
-            >
-              {/* <HomeIcon className="w-5 h-5" /> */}
-              <span>Login</span>
-            </button>
-          )}
+         
 
           {/* Home for USER */}
           {/* {role === 'USER' && ( */}
@@ -118,6 +113,15 @@ function Navbar({ searchTerm, setSearchTerm }) {
               <span>Logout</span>
             </button> :""
           }
+           {!role && (
+            <button
+              className={`getNavItemClass('/login ') w-[100px] text-2xl ps-5 flex items-center space-x-2 p-2 rounded-full bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white font-semibold hover:opacity-90 transition-all shadow-lg` }
+              onClick={() => navigate('/login')}
+            >
+              {/* <HomeIcon className="w-5 h-5" /> */}
+              <span>Login</span>
+            </button>
+          )}
         </div>
       </div>
     </nav>

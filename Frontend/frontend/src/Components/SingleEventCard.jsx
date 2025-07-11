@@ -44,6 +44,7 @@ function SingleEventCard() {
               key={index}
               className="text-xs bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full"
             >
+              
               #{tag}
             </span>
           ))}

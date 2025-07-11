@@ -24,7 +24,7 @@ public class UserService {
         }
         user.setActive(true);
 
-        // ✅ Encrypt the password using BCrypt before saving
+        
         user.setPassword(passwordEncode.encode(user.getPassword()));
 
         return userRepository.save(user);
@@ -49,7 +49,7 @@ public class UserService {
         User user = getUserById(id);
         if (user != null) {
             user.setActive(!user.isActive());
-            userRepository.save(user);  // ✅ important to persist the change
+            userRepository.save(user); 
         }
     }
 

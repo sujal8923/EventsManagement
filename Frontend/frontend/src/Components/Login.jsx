@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ function Login({ setLoggedIn, setLogin, setUserId }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [loginForm, setLoginForm] = useState({
     email: '',
-    password: '',
+    passwords: ''
   });
 
   const [signupForm, setSignupForm] = useState({
@@ -37,13 +37,13 @@ function Login({ setLoggedIn, setLogin, setUserId }) {
     setErrorMsg('');
 
     if (isLoginMode) {
-      const { email, password } = loginForm;
-      if (!email || !password) {
+      const { email, passwords } = loginForm;
+      if (!email || !passwords) {
         setErrorMsg('Please fill all fields.');
         return;
       }
 
-      const payload = { email, password };
+      const payload = { email, passwords };
       axios.post('http://localhost:8080/login', payload)
         .then((response) => {
           const { token, role, userId } = response.data;
@@ -62,10 +62,9 @@ function Login({ setLoggedIn, setLogin, setUserId }) {
           }
 
           alert('Login successful');
-          setLoginForm({ email: '', password: '' });
+          setLoginForm({ email: '', passwords: '' });
         })
         .catch((error) => {
-          console.error('Login Error:', error);
           if (error.response) {
             const status = error.response.status;
             if (status === 403) {
@@ -102,7 +101,6 @@ function Login({ setLoggedIn, setLogin, setUserId }) {
           });
         })
         .catch((error) => {
-          console.error('Signup Error:', error);
           if (error.response && error.response.data) {
             setErrorMsg(error.response.data.message || 'Signup failed. Please try again.');
           } else {
@@ -125,24 +123,18 @@ function Login({ setLoggedIn, setLogin, setUserId }) {
         <div className="relative flex h-12 mb-6 border border-gray-300 rounded-full overflow-hidden">
           <button
             onClick={() => setIsLoginMode(true)}
-            className={`w-1/2 z-10 text-lg font-medium transition-all hover:font-semibold ${
-              isLoginMode ? 'text-white' : 'text-gray-700'
-            }`}
+            className={`w-1/2 z-10 text-lg font-medium transition-all hover:font-semibold ${isLoginMode ? 'text-white' : 'text-gray-700'}`}
           >
             Login
           </button>
           <button
             onClick={() => setIsLoginMode(false)}
-            className={`w-1/2 z-10 text-lg font-medium transition-all hover:font-semibold ${
-              !isLoginMode ? 'text-white' : 'text-gray-700'
-            }`}
+            className={`w-1/2 z-10 text-lg font-medium transition-all hover:font-semibold ${!isLoginMode ? 'text-white' : 'text-gray-700'}`}
           >
             Sign Up
           </button>
           <div
-            className={`absolute top-0 h-full w-1/2 rounded-full bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 transition-all duration-300 ease-in-out ${
-              isLoginMode ? 'left-0' : 'left-1/2'
-            }`}
+            className={`absolute top-0 h-full w-1/2 rounded-full bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 transition-all duration-300 ease-in-out ${isLoginMode ? 'left-0' : 'left-1/2'}`}
           ></div>
         </div>
 
@@ -179,9 +171,9 @@ function Login({ setLoggedIn, setLogin, setUserId }) {
             <LockClosedIcon className="w-5 h-5 absolute left-3 top-3.5 text-gray-400" />
             <input
               type="password"
-              name="password"
+              name={isLoginMode ? 'passwords' : 'password'}
               placeholder="Password"
-              value={isLoginMode ? loginForm.password : signupForm.password}
+              value={isLoginMode ? loginForm.passwords : signupForm.password}
               onChange={(e) => handleChange(e, isLoginMode ? 'login' : 'signup')}
               className={inputStyle}
               required

@@ -43,9 +43,9 @@ public class AdminController {
             return ResponseEntity.status(404).body("User not found");
         }
 
-        userService.toggleUserStatus(id); // toggling inside service
+        userService.toggleUserStatus(id); 
 
-        // After toggle, fetch again to get updated status
+    
         User updatedUser = userService.getUserById(id);
         return ResponseEntity.ok("User is now " + (updatedUser.isActive() ? "active" : "inactive"));
     }

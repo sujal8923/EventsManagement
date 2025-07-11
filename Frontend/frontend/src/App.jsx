@@ -11,7 +11,7 @@ import ContactUs from "./Components/ContactUs";
 import EventDetailPage from "./Components/EventDetailPage";
 import RegistrationForm from "./Components/RegistrationForm";
 import Navbar from "./Components/Navbar";
-// import ProtectedRoutes from "./Components/ProtectedRoutes";
+import ProtectedRoutes from "./Components/ProtectedRoutes";
 import UserHomePage from "./Components/UserHomePage";
 
 function AppContent() {
@@ -64,17 +64,17 @@ function AppContent() {
         <Route
           path="/superadmin"
           element={
-            // <ProtectedRoutes allowedRoles={["SUPER_ADMIN"]}>
+            <ProtectedRoutes allowedRoles={["SUPER_ADMIN"]}>
               <SuperadminDashboard />
-            // </ProtectedRoutes>
+             </ProtectedRoutes>
           }
         />
         <Route
           path="/admin"
           element={
-            // <ProtectedRoutes allowedRoles={["ADMIN"]}>
+            <ProtectedRoutes allowedRoles={["ADMIN"]}>
               <AdminDashboard />
-            // </ProtectedRoutes>
+             </ProtectedRoutes>
           }
         />
         {/* 404 fallback */}

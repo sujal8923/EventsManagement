@@ -17,7 +17,7 @@ public class GlobalCorsConfig {
                         .allowedOrigins("http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(false); // Keep false unless you’re sending cookies
+                        .allowCredentials(false); 
             }
         };
     }

@@ -35,12 +35,15 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
 
-        String path = request.getServletPath();
-        if (path.equals("/login") || path.equals("/register")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
+       String path = request.getServletPath();
+if (path.equals("/login") ||
+    path.equals("/register") ||
+    path.startsWith("/swagger-ui") ||
+    path.startsWith("/v3/api-docs")
+) {
+    chain.doFilter(request, response);
+    return;
+}
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
@@ -67,19 +70,19 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-        // If username is extracted and no authentication is currently set in SecurityContext
+        
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = null;
             try {
                 userDetails = userDetailsService.loadUserByUsername(username);
             } catch (UsernameNotFoundException e) {
-                // User associated with token not found in DB
+               
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 response.getWriter().write("User not found for the provided token: " + e.getMessage());
                 return;
             }
 
-            // If userDetails are found and token is valid
+           
             if (userDetails != null && jwtUtil.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
@@ -92,8 +95,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
         }
-        // If authHeader is null or doesn't start with "Bearer ", or if SecurityContext already has auth,
-        // proceed to the next filter. Spring Security will then determine if the endpoint requires authentication.
+   
 
         chain.doFilter(request, response);
     }

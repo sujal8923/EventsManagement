@@ -8,7 +8,7 @@ function ProtectedRoutes({allowedRoles, children}) {
                 <h1 className="text-4xl font-bold mb-4">403 - Forbidden</h1>
                 <p className="mb-4">You do not have permission to access this page.</p>
                 <a
-                    href="/"
+                    href="/login"
                     className="p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 text-white rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-lg"
                 >
                     Go to Login
